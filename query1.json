@@ -11,8 +11,8 @@
                     "Total Cost": 158094.8,
                     "Plan Rows": 150000,
                     "Plan Width": 12,
-                    "Actual Startup Time": 1304.017,
-                    "Actual Total Time": 1547.842,
+                    "Actual Startup Time": 1314.021,
+                    "Actual Total Time": 1576.016,
                     "Actual Rows": 150000,
                     "Actual Loops": 1,
                     "Output": [
@@ -31,8 +31,8 @@
                             "Total Cost": 155094.8,
                             "Plan Rows": 300000,
                             "Plan Width": 12,
-                            "Actual Startup Time": 1304.008,
-                            "Actual Total Time": 1485.178,
+                            "Actual Startup Time": 1314.002,
+                            "Actual Total Time": 1520.298,
                             "Actual Rows": 150000,
                             "Actual Loops": 1,
                             "Output": [
@@ -50,8 +50,8 @@
                                     "Total Cost": 119467.33,
                                     "Plan Rows": 150000,
                                     "Plan Width": 12,
-                                    "Actual Startup Time": 1248.476,
-                                    "Actual Total Time": 1257.156,
+                                    "Actual Startup Time": 1215.94,
+                                    "Actual Total Time": 1225.816,
                                     "Actual Rows": 50000,
                                     "Actual Loops": 3,
                                     "Output": [
@@ -62,27 +62,27 @@
                                         "customer.c_custkey"
                                     ],
                                     "Sort Method": "quicksort",
-                                    "Sort Space Used": 3472,
+                                    "Sort Space Used": 3792,
                                     "Sort Space Type": "Memory",
                                     "Workers": [
                                         {
                                             "Worker Number": 0,
-                                            "Actual Startup Time": 1247.362,
-                                            "Actual Total Time": 1256.547,
-                                            "Actual Rows": 53629,
+                                            "Actual Startup Time": 1171.77,
+                                            "Actual Total Time": 1181.654,
+                                            "Actual Rows": 48647,
                                             "Actual Loops": 1,
                                             "Sort Method": "quicksort",
-                                            "Sort Space Used": 3880,
+                                            "Sort Space Used": 3646,
                                             "Sort Space Type": "Memory"
                                         },
                                         {
                                             "Worker Number": 1,
-                                            "Actual Startup Time": 1231.464,
-                                            "Actual Total Time": 1240.283,
-                                            "Actual Rows": 51449,
+                                            "Actual Startup Time": 1163.905,
+                                            "Actual Total Time": 1173.928,
+                                            "Actual Rows": 49588,
                                             "Actual Loops": 1,
                                             "Sort Method": "quicksort",
-                                            "Sort Space Used": 3777,
+                                            "Sort Space Used": 3690,
                                             "Sort Space Type": "Memory"
                                         }
                                     ],
@@ -97,8 +97,8 @@
                                             "Total Cost": 103630.88,
                                             "Plan Rows": 150000,
                                             "Plan Width": 12,
-                                            "Actual Startup Time": 1142.61,
-                                            "Actual Total Time": 1229.066,
+                                            "Actual Startup Time": 1100.18,
+                                            "Actual Total Time": 1191.746,
                                             "Actual Rows": 50000,
                                             "Actual Loops": 3,
                                             "Output": [
@@ -111,27 +111,27 @@
                                             "Planned Partitions": 4,
                                             "HashAgg Batches": 5,
                                             "Peak Memory Usage": 4145,
-                                            "Disk Usage": 7024,
+                                            "Disk Usage": 7488,
                                             "Workers": [
                                                 {
                                                     "Worker Number": 0,
-                                                    "Actual Startup Time": 1132.992,
-                                                    "Actual Total Time": 1226.837,
-                                                    "Actual Rows": 53629,
+                                                    "Actual Startup Time": 1068.43,
+                                                    "Actual Total Time": 1149.351,
+                                                    "Actual Rows": 48647,
                                                     "Actual Loops": 1,
                                                     "HashAgg Batches": 5,
                                                     "Peak Memory Usage": 4145,
-                                                    "Disk Usage": 7624
+                                                    "Disk Usage": 7280
                                                 },
                                                 {
                                                     "Worker Number": 1,
-                                                    "Actual Startup Time": 1113.75,
-                                                    "Actual Total Time": 1213.661,
-                                                    "Actual Rows": 51449,
+                                                    "Actual Startup Time": 1055.352,
+                                                    "Actual Total Time": 1141.787,
+                                                    "Actual Rows": 49588,
                                                     "Actual Loops": 1,
                                                     "HashAgg Batches": 5,
                                                     "Peak Memory Usage": 4145,
-                                                    "Disk Usage": 7504
+                                                    "Disk Usage": 7328
                                                 }
                                             ],
                                             "Plans": [
@@ -144,8 +144,8 @@
                                                     "Total Cost": 62496.24,
                                                     "Plan Rows": 618687,
                                                     "Plan Width": 8,
-                                                    "Actual Startup Time": 696.06,
-                                                    "Actual Total Time": 946.751,
+                                                    "Actual Startup Time": 585.557,
+                                                    "Actual Total Time": 881.861,
                                                     "Actual Rows": 511301,
                                                     "Actual Loops": 3,
                                                     "Output": [
@@ -157,16 +157,16 @@
                                                     "Workers": [
                                                         {
                                                             "Worker Number": 0,
-                                                            "Actual Startup Time": 684.991,
-                                                            "Actual Total Time": 934.733,
-                                                            "Actual Rows": 546959,
+                                                            "Actual Startup Time": 557.053,
+                                                            "Actual Total Time": 852.522,
+                                                            "Actual Rows": 497589,
                                                             "Actual Loops": 1
                                                         },
                                                         {
                                                             "Worker Number": 1,
-                                                            "Actual Startup Time": 673.472,
-                                                            "Actual Total Time": 919.931,
-                                                            "Actual Rows": 526704,
+                                                            "Actual Startup Time": 545.928,
+                                                            "Actual Total Time": 838.003,
+                                                            "Actual Rows": 506226,
                                                             "Actual Loops": 1
                                                         }
                                                     ],
@@ -184,8 +184,8 @@
                                                             "Total Cost": 3031.42,
                                                             "Plan Rows": 62500,
                                                             "Plan Width": 4,
-                                                            "Actual Startup Time": 0.159,
-                                                            "Actual Total Time": 8.039,
+                                                            "Actual Startup Time": 0.145,
+                                                            "Actual Total Time": 9.029,
                                                             "Actual Rows": 50000,
                                                             "Actual Loops": 3,
                                                             "Output": [
@@ -195,16 +195,16 @@
                                                             "Workers": [
                                                                 {
                                                                     "Worker Number": 0,
-                                                                    "Actual Startup Time": 0.209,
-                                                                    "Actual Total Time": 7.405,
-                                                                    "Actual Rows": 53436,
+                                                                    "Actual Startup Time": 0.18,
+                                                                    "Actual Total Time": 9.367,
+                                                                    "Actual Rows": 55632,
                                                                     "Actual Loops": 1
                                                                 },
                                                                 {
                                                                     "Worker Number": 1,
-                                                                    "Actual Startup Time": 0.232,
-                                                                    "Actual Total Time": 7.797,
-                                                                    "Actual Rows": 52278,
+                                                                    "Actual Startup Time": 0.208,
+                                                                    "Actual Total Time": 9.344,
+                                                                    "Actual Rows": 49044,
                                                                     "Actual Loops": 1
                                                                 }
                                                             ]
@@ -217,8 +217,8 @@
                                                             "Total Cost": 33907.5,
                                                             "Plan Rows": 618687,
                                                             "Plan Width": 8,
-                                                            "Actual Startup Time": 601.186,
-                                                            "Actual Total Time": 601.187,
+                                                            "Actual Startup Time": 490.28,
+                                                            "Actual Total Time": 490.281,
                                                             "Actual Rows": 494633,
                                                             "Actual Loops": 3,
                                                             "Output": [
@@ -229,20 +229,20 @@
                                                             "Original Hash Buckets": 131072,
                                                             "Hash Batches": 32,
                                                             "Original Hash Batches": 32,
-                                                            "Peak Memory Usage": 2944,
+                                                            "Peak Memory Usage": 2912,
                                                             "Workers": [
                                                                 {
                                                                     "Worker Number": 0,
-                                                                    "Actual Startup Time": 586.639,
-                                                                    "Actual Total Time": 586.64,
-                                                                    "Actual Rows": 491939,
+                                                                    "Actual Startup Time": 458.149,
+                                                                    "Actual Total Time": 458.151,
+                                                                    "Actual Rows": 475024,
                                                                     "Actual Loops": 1
                                                                 },
                                                                 {
                                                                     "Worker Number": 1,
-                                                                    "Actual Startup Time": 574.778,
-                                                                    "Actual Total Time": 574.779,
-                                                                    "Actual Rows": 472165,
+                                                                    "Actual Startup Time": 447.014,
+                                                                    "Actual Total Time": 447.015,
+                                                                    "Actual Rows": 462519,
                                                                     "Actual Loops": 1
                                                                 }
                                                             ],
@@ -258,8 +258,8 @@
                                                                     "Total Cost": 33907.5,
                                                                     "Plan Rows": 618687,
                                                                     "Plan Width": 8,
-                                                                    "Actual Startup Time": 0.166,
-                                                                    "Actual Total Time": 354.995,
+                                                                    "Actual Startup Time": 0.256,
+                                                                    "Actual Total Time": 281.435,
                                                                     "Actual Rows": 494633,
                                                                     "Actual Loops": 3,
                                                                     "Output": [
@@ -271,16 +271,16 @@
                                                                     "Workers": [
                                                                         {
                                                                             "Worker Number": 0,
-                                                                            "Actual Startup Time": 0.259,
-                                                                            "Actual Total Time": 345.148,
-                                                                            "Actual Rows": 491939,
+                                                                            "Actual Startup Time": 0.299,
+                                                                            "Actual Total Time": 269.203,
+                                                                            "Actual Rows": 475024,
                                                                             "Actual Loops": 1
                                                                         },
                                                                         {
                                                                             "Worker Number": 1,
-                                                                            "Actual Startup Time": 0.23,
-                                                                            "Actual Total Time": 335.754,
-                                                                            "Actual Rows": 472165,
+                                                                            "Actual Startup Time": 0.253,
+                                                                            "Actual Total Time": 259.886,
+                                                                            "Actual Rows": 462519,
                                                                             "Actual Loops": 1
                                                                         }
                                                                     ]
@@ -297,9 +297,9 @@
                         }
                     ]
                 },
-                "Planning Time": 0.251,
+                "Planning Time": 4.986,
                 "Triggers": [],
-                "Execution Time": 1557.194
+                "Execution Time": 1588.833
             }
         ]
     ]
