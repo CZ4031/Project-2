@@ -1,11 +1,11 @@
-from preprocessing import validateConnect, executeQuery
+from preprocessing import *
 
 if __name__ == "__main__":
     # username = "postgres"
     # password = ""
     # database_name = "TPC-H"
     print("Welcome to CZ4003 database")
-    #validateConnect(username, password, database_name)
+    connect = SetUp()
     query = "SELECT * FROM customer"
-    result = executeQuery(query)
+    result = connect.executeQuery(query)
     print(result)
