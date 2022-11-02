@@ -1,0 +1,36 @@
+[
+    [
+        [
+            {
+                "Plan": {
+                    "Node Type": "Seq Scan",
+                    "Parallel Aware": false,
+                    "Relation Name": "customer",
+                    "Schema": "public",
+                    "Alias": "customer",
+                    "Startup Cost": 0.0,
+                    "Total Cost": 5083.0,
+                    "Plan Rows": 150000,
+                    "Plan Width": 159,
+                    "Actual Startup Time": 0.03,
+                    "Actual Total Time": 55.908,
+                    "Actual Rows": 150000,
+                    "Actual Loops": 1,
+                    "Output": [
+                        "c_custkey",
+                        "c_name",
+                        "c_address",
+                        "c_nationkey",
+                        "c_phone",
+                        "c_acctbal",
+                        "c_mktsegment",
+                        "c_comment"
+                    ]
+                },
+                "Planning Time": 2.021,
+                "Triggers": [],
+                "Execution Time": 65.514
+            }
+        ]
+    ]
+]
