@@ -1,4 +1,4 @@
-CREATE TABLE public.nation
+CREATE TABLE public.part
 (
   p_partkey integer NOT NULL,
   p_name character varying(55) COLLATE pg_catalog."default" NOT NULL,
