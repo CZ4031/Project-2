@@ -16,6 +16,10 @@ class PlanNode():
         self.parent = None
         self.children = []
         self.attributes = {}
+        self.annotations = ""
+        self.alternate_cost = -1
+        self.alternate_scans = ""
+        self.alternate_scan_dict = {}
     
     def print_tree(self):
         queue = []
@@ -103,7 +107,7 @@ class SetUp():
             self.verify = False
 
     def executeQuery(self, query, off=[]):
-        optimalQEP = "EXPLAIN (ANALYSE, VERBOSE, COSTS, FORMAT JSON)" + query
+        optimalQEP = "EXPLAIN (VERBOSE, COSTS, FORMAT JSON)" + query
 
         try:
             # set cursor variable
@@ -179,6 +183,13 @@ class SetUp():
         print("original join: ",root.check_for_join())
         self.query_plans["chosen_plan"] = root
         #connect.query_plans["chosen_plan"].print_tree()
+
+        # Test
+        plan = self.executeQuery(query, ["Index Scan", "Bitmap Scan", "Index Only Scan", "Tid Scan"])
+        if(plan != "error"):
+            alternate_root = self.build_tree(plan)
+            #print("NL join: ",root.check_for_join_type())
+            self.query_plans["alternative_plans"].append(alternate_root)
 
         #Alternate plans (Max: 11)
         #Checking for AEP for Joins 

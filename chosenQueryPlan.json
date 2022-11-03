@@ -11,10 +11,6 @@
                     "Total Cost": 158094.8,
                     "Plan Rows": 150000,
                     "Plan Width": 12,
-                    "Actual Startup Time": 1304.017,
-                    "Actual Total Time": 1547.842,
-                    "Actual Rows": 150000,
-                    "Actual Loops": 1,
                     "Output": [
                         "customer.c_custkey",
                         "count(orders.o_orderkey)"
@@ -31,16 +27,11 @@
                             "Total Cost": 155094.8,
                             "Plan Rows": 300000,
                             "Plan Width": 12,
-                            "Actual Startup Time": 1304.008,
-                            "Actual Total Time": 1485.178,
-                            "Actual Rows": 150000,
-                            "Actual Loops": 1,
                             "Output": [
                                 "customer.c_custkey",
                                 "(PARTIAL count(orders.o_orderkey))"
                             ],
                             "Workers Planned": 2,
-                            "Workers Launched": 2,
                             "Plans": [
                                 {
                                     "Node Type": "Sort",
@@ -50,41 +41,12 @@
                                     "Total Cost": 119467.33,
                                     "Plan Rows": 150000,
                                     "Plan Width": 12,
-                                    "Actual Startup Time": 1248.476,
-                                    "Actual Total Time": 1257.156,
-                                    "Actual Rows": 50000,
-                                    "Actual Loops": 3,
                                     "Output": [
                                         "customer.c_custkey",
                                         "(PARTIAL count(orders.o_orderkey))"
                                     ],
                                     "Sort Key": [
                                         "customer.c_custkey"
-                                    ],
-                                    "Sort Method": "quicksort",
-                                    "Sort Space Used": 3472,
-                                    "Sort Space Type": "Memory",
-                                    "Workers": [
-                                        {
-                                            "Worker Number": 0,
-                                            "Actual Startup Time": 1247.362,
-                                            "Actual Total Time": 1256.547,
-                                            "Actual Rows": 53629,
-                                            "Actual Loops": 1,
-                                            "Sort Method": "quicksort",
-                                            "Sort Space Used": 3880,
-                                            "Sort Space Type": "Memory"
-                                        },
-                                        {
-                                            "Worker Number": 1,
-                                            "Actual Startup Time": 1231.464,
-                                            "Actual Total Time": 1240.283,
-                                            "Actual Rows": 51449,
-                                            "Actual Loops": 1,
-                                            "Sort Method": "quicksort",
-                                            "Sort Space Used": 3777,
-                                            "Sort Space Type": "Memory"
-                                        }
                                     ],
                                     "Plans": [
                                         {
@@ -97,10 +59,6 @@
                                             "Total Cost": 103630.88,
                                             "Plan Rows": 150000,
                                             "Plan Width": 12,
-                                            "Actual Startup Time": 1142.61,
-                                            "Actual Total Time": 1229.066,
-                                            "Actual Rows": 50000,
-                                            "Actual Loops": 3,
                                             "Output": [
                                                 "customer.c_custkey",
                                                 "PARTIAL count(orders.o_orderkey)"
@@ -109,31 +67,6 @@
                                                 "customer.c_custkey"
                                             ],
                                             "Planned Partitions": 4,
-                                            "HashAgg Batches": 5,
-                                            "Peak Memory Usage": 4145,
-                                            "Disk Usage": 7024,
-                                            "Workers": [
-                                                {
-                                                    "Worker Number": 0,
-                                                    "Actual Startup Time": 1132.992,
-                                                    "Actual Total Time": 1226.837,
-                                                    "Actual Rows": 53629,
-                                                    "Actual Loops": 1,
-                                                    "HashAgg Batches": 5,
-                                                    "Peak Memory Usage": 4145,
-                                                    "Disk Usage": 7624
-                                                },
-                                                {
-                                                    "Worker Number": 1,
-                                                    "Actual Startup Time": 1113.75,
-                                                    "Actual Total Time": 1213.661,
-                                                    "Actual Rows": 51449,
-                                                    "Actual Loops": 1,
-                                                    "HashAgg Batches": 5,
-                                                    "Peak Memory Usage": 4145,
-                                                    "Disk Usage": 7504
-                                                }
-                                            ],
                                             "Plans": [
                                                 {
                                                     "Node Type": "Hash Join",
@@ -144,32 +77,12 @@
                                                     "Total Cost": 62496.24,
                                                     "Plan Rows": 618687,
                                                     "Plan Width": 8,
-                                                    "Actual Startup Time": 696.06,
-                                                    "Actual Total Time": 946.751,
-                                                    "Actual Rows": 511301,
-                                                    "Actual Loops": 3,
                                                     "Output": [
                                                         "customer.c_custkey",
                                                         "orders.o_orderkey"
                                                     ],
                                                     "Inner Unique": false,
                                                     "Hash Cond": "(customer.c_custkey = orders.o_custkey)",
-                                                    "Workers": [
-                                                        {
-                                                            "Worker Number": 0,
-                                                            "Actual Startup Time": 684.991,
-                                                            "Actual Total Time": 934.733,
-                                                            "Actual Rows": 546959,
-                                                            "Actual Loops": 1
-                                                        },
-                                                        {
-                                                            "Worker Number": 1,
-                                                            "Actual Startup Time": 673.472,
-                                                            "Actual Total Time": 919.931,
-                                                            "Actual Rows": 526704,
-                                                            "Actual Loops": 1
-                                                        }
-                                                    ],
                                                     "Plans": [
                                                         {
                                                             "Node Type": "Index Only Scan",
@@ -184,29 +97,8 @@
                                                             "Total Cost": 3031.42,
                                                             "Plan Rows": 62500,
                                                             "Plan Width": 4,
-                                                            "Actual Startup Time": 0.159,
-                                                            "Actual Total Time": 8.039,
-                                                            "Actual Rows": 50000,
-                                                            "Actual Loops": 3,
                                                             "Output": [
                                                                 "customer.c_custkey"
-                                                            ],
-                                                            "Heap Fetches": 0,
-                                                            "Workers": [
-                                                                {
-                                                                    "Worker Number": 0,
-                                                                    "Actual Startup Time": 0.209,
-                                                                    "Actual Total Time": 7.405,
-                                                                    "Actual Rows": 53436,
-                                                                    "Actual Loops": 1
-                                                                },
-                                                                {
-                                                                    "Worker Number": 1,
-                                                                    "Actual Startup Time": 0.232,
-                                                                    "Actual Total Time": 7.797,
-                                                                    "Actual Rows": 52278,
-                                                                    "Actual Loops": 1
-                                                                }
                                                             ]
                                                         },
                                                         {
@@ -217,34 +109,9 @@
                                                             "Total Cost": 33907.5,
                                                             "Plan Rows": 618687,
                                                             "Plan Width": 8,
-                                                            "Actual Startup Time": 601.186,
-                                                            "Actual Total Time": 601.187,
-                                                            "Actual Rows": 494633,
-                                                            "Actual Loops": 3,
                                                             "Output": [
                                                                 "orders.o_orderkey",
                                                                 "orders.o_custkey"
-                                                            ],
-                                                            "Hash Buckets": 131072,
-                                                            "Original Hash Buckets": 131072,
-                                                            "Hash Batches": 32,
-                                                            "Original Hash Batches": 32,
-                                                            "Peak Memory Usage": 2944,
-                                                            "Workers": [
-                                                                {
-                                                                    "Worker Number": 0,
-                                                                    "Actual Startup Time": 586.639,
-                                                                    "Actual Total Time": 586.64,
-                                                                    "Actual Rows": 491939,
-                                                                    "Actual Loops": 1
-                                                                },
-                                                                {
-                                                                    "Worker Number": 1,
-                                                                    "Actual Startup Time": 574.778,
-                                                                    "Actual Total Time": 574.779,
-                                                                    "Actual Rows": 472165,
-                                                                    "Actual Loops": 1
-                                                                }
                                                             ],
                                                             "Plans": [
                                                                 {
@@ -258,32 +125,11 @@
                                                                     "Total Cost": 33907.5,
                                                                     "Plan Rows": 618687,
                                                                     "Plan Width": 8,
-                                                                    "Actual Startup Time": 0.166,
-                                                                    "Actual Total Time": 354.995,
-                                                                    "Actual Rows": 494633,
-                                                                    "Actual Loops": 3,
                                                                     "Output": [
                                                                         "orders.o_orderkey",
                                                                         "orders.o_custkey"
                                                                     ],
-                                                                    "Filter": "((orders.o_comment)::text !~~ '%pending%packages%'::text)",
-                                                                    "Rows Removed by Filter": 5367,
-                                                                    "Workers": [
-                                                                        {
-                                                                            "Worker Number": 0,
-                                                                            "Actual Startup Time": 0.259,
-                                                                            "Actual Total Time": 345.148,
-                                                                            "Actual Rows": 491939,
-                                                                            "Actual Loops": 1
-                                                                        },
-                                                                        {
-                                                                            "Worker Number": 1,
-                                                                            "Actual Startup Time": 0.23,
-                                                                            "Actual Total Time": 335.754,
-                                                                            "Actual Rows": 472165,
-                                                                            "Actual Loops": 1
-                                                                        }
-                                                                    ]
+                                                                    "Filter": "((orders.o_comment)::text !~~ '%pending%packages%'::text)"
                                                                 }
                                                             ]
                                                         }
@@ -296,10 +142,7 @@
                             ]
                         }
                     ]
-                },
-                "Planning Time": 0.251,
-                "Triggers": [],
-                "Execution Time": 1557.194
+                }
             }
         ]
     ]
