@@ -1,0 +1,1 @@
+ connect.getAllQueryPlans(query)
