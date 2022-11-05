@@ -17,9 +17,9 @@ class PlanNode():
         self.children = []
         self.attributes = {}
         self.annotations = ""
-        self.alternate_cost = -1
-        self.alternate_scans = ""
-        self.alternate_scan_dict = {}
+        self.alternate_plans = {} # Key: alternative plan used, Value: ratio, how much more costly (alternate plan cost / optimal cost)
+        #self.alternate_scans = ""
+        #self.alternate_scan_dict = {}
     
     def print_tree(self):
         queue = []
@@ -30,7 +30,7 @@ class PlanNode():
             for i in range(childlength):
                 node = queue.pop(0)
                 if node != None:
-                    print(node.attributes['Node Type'] + "->cost: ", node.attributes['Total Cost'] , end='\n')
+                    print(node.attributes['Node Type'] + "->cost: ", node.attributes['Total Cost'], "->Alternate Plans: ", node.alternate_plans , end='\n')
                 for child in node.children:
                     queue.append(child)
 
@@ -88,8 +88,8 @@ class SetUp():
     }
 
     query_plans = {
-        "chosen_plan": "",
-        "alternative_plans": []
+        "chosen_plan": "", # Will be replaced by a tuple of (plan_type, root_node, cost)
+        "alternative_plans": [] # List of tuples (plan_type, root_node, cost)
     }
 
 
@@ -113,10 +113,13 @@ class SetUp():
             # set cursor variable
             cursor = self.cursor
             #Setting off for alternate query plans
+            cursor.execute("set statement_timeout = 5000")
+            # Default turn off variables not used
+            cursor.execute(self.off_config["Tid Scan"])
+            cursor.execute(self.off_config["Index Only Scan"])
             for condition in off:
                 #print(self.off_config[condition])
                 # 5s timeout
-                cursor.execute("set statement_timeout = 5000")
                 cursor.execute(self.off_config[condition])
             
             cursor.execute(optimalQEP)
@@ -128,8 +131,8 @@ class SetUp():
                 #print(self.on_config[condition])
                 cursor.execute(self.on_config[condition])
             # write explain details into json file
-            with open('chosenQueryPlan.json', 'w') as output_file:
-                chosenQueryPlan = (json.dump(explain_query, output_file, ensure_ascii = False, indent = 4))
+            # with open('chosenQueryPlan.json', 'w') as output_file:
+            #     chosenQueryPlan = (json.dump(explain_query, output_file, ensure_ascii = False, indent = 4))
 
             return explain_query[0][0][0]['Plan']
         except(Exception, psycopg2.DatabaseError) as error:
@@ -174,6 +177,73 @@ class SetUp():
         self.add_node(plan,root)
         return root
 
+    def compareTree(self, chosen_plan_root, alternate_plan_root):
+        queue1 = []
+        queue2 = []
+        queue1.append(chosen_plan_root)
+        queue2.append(alternate_plan_root)
+        while len(queue1) != 0:
+            childlength = len(queue1)
+            # Add appropriate children ndoes
+            for i in range(childlength):
+                node1 = queue1.pop(0)
+                node2 = queue2.pop(0)
+                if node1.attributes['Node Type'] != node2.attributes['Node Type']:
+                    return 0
+                for child in node1.children:
+                    queue1.append(child)
+                for child in node2.children:
+                    queue2.append(child)
+        return 1
+
+    def computeTotalCost(self, plan_root):
+        queue = []
+        queue.append(plan_root)
+        totalCost = 0
+        while len(queue) != 0:
+            childlength = len(queue)
+            # Add appropriate children ndoes
+            for i in range(childlength):
+                node = queue.pop(0)
+                if node != None:
+                    totalCost += node.attributes['Total Cost']
+                for child in node.children:
+                    queue.append(child)
+        return totalCost
+
+    def addToAlternatePlans(self, plan, plan_type):
+        if(plan == "eror"):
+            print(plan_type + " not added")
+            return
+        alternate_root = self.build_tree(plan)
+        # If both trees are the same dont add to alternate plan
+        if(self.compareTree(self.query_plans['chosen_plan'][1], alternate_root) == 1):
+            print(plan_type + " not added")
+            return
+        cost = self.computeTotalCost(alternate_root)
+        self.query_plans["alternative_plans"].append((plan_type,alternate_root, cost))
+
+    def preAnnotation(self, optimalTreeRoot):
+        queue = []
+        queue.append(optimalTreeRoot)
+        while len(queue) != 0:
+            childlength = len(queue)
+            # Add appropriate children ndoes
+            for i in range(childlength):
+                node = queue.pop(0)
+                if "Join" in node.attributes['Node Type'] or "Loop" in node.attributes['Node Type']:
+                    for alternate_nodes in self.query_plans["alternative_plans"]:
+                        if ("Join" in alternate_nodes[0] or "Loop" in alternate_nodes[0]) and (alternate_nodes[0] != node.attributes['Node Type']):
+                            # total alternate plan cost / total optimal plan cost
+                            node.alternate_plans[alternate_nodes[0]] = alternate_nodes[2]/self.query_plans["chosen_plan"][2]
+                elif "Scan" in node.attributes['Node Type']:
+                    for alternate_nodes in self.query_plans["alternative_plans"]:
+                        if "Scan" in alternate_nodes[0] and (alternate_nodes[0] != node.attributes['Node Type']):
+                            # total alternate plan cost / total optimal plan cost
+                            node.alternate_plans[alternate_nodes[0]] = alternate_nodes[2]/self.query_plans["chosen_plan"][2]
+                for child in node.children:
+                    queue.append(child)
+
    
     def getAllQueryPlans(self, query):
 
@@ -181,101 +251,46 @@ class SetUp():
         plan = self.executeQuery(query)
         root = self.build_tree(plan)
         print("original join: ",root.check_for_join())
-        self.query_plans["chosen_plan"] = root
-        #connect.query_plans["chosen_plan"].print_tree()
+        cost = self.computeTotalCost(root)
+        self.query_plans["chosen_plan"]= ("Optimal Plan", root, cost)
 
-        # Test
-        plan = self.executeQuery(query, ["Index Scan", "Bitmap Scan", "Index Only Scan", "Tid Scan"])
-        if(plan != "error"):
-            alternate_root = self.build_tree(plan)
-            #print("NL join: ",root.check_for_join_type())
-            self.query_plans["alternative_plans"].append(alternate_root)
 
-        #Alternate plans (Max: 11)
+        #Alternate plans (Max: 6)
         #Checking for AEP for Joins 
         #Full Merge Join
         plan = self.executeQuery(query, ["Nested Loop", "Hash Join"])
-        if(plan != "error"):
-            alternate_root = self.build_tree(plan)
-            #print("Merge join: ",root.check_for_join_type())
-            self.query_plans["alternative_plans"].append(alternate_root)
+        plan_type = "Merge Join"
+        self.addToAlternatePlans(plan, plan_type)
 
         #Full hash join
         plan = self.executeQuery(query, ['Nested Loop', "Merge Join"])
-        if(plan != "error"):
-            alternate_root = self.build_tree(plan)
-            #print("Hash join: ",root.check_for_join_type())
-            self.query_plans["alternative_plans"].append(alternate_root)
+        plan_type = "Hash Join"
+        self.addToAlternatePlans(plan, plan_type)
 
         #Full nested loop join
         plan = self.executeQuery(query, ['Merge Join', "Hash Join"])
-        if(plan != "error"):
-            alternate_root = self.build_tree(plan)
-            #print("NL join: ",root.check_for_join_type())
-            self.query_plans["alternative_plans"].append(alternate_root)
+        plan_type = "Nested Loop"
+        self.addToAlternatePlans(plan, plan_type)
 
         #Checking for AEP for Scans
         #Seq scan 
-        plan = self.executeQuery(query, ["Index Scan", "Bitmap Scan", "Index Only Scan", "Tid Scan"])
-        if(plan != "error"):
-            alternate_root = self.build_tree(plan)
-            #print("NL join: ",root.check_for_join_type())
-            self.query_plans["alternative_plans"].append(alternate_root)
+        plan = self.executeQuery(query, ["Index Scan", "Bitmap Scan"])
+        plan_type = "Seq Scan"
+        self.addToAlternatePlans(plan, plan_type)
 
         # Index Scan
-        plan = self.executeQuery(query, ["Seq Scan", "Bitmap Scan", "Index Only Scan", "Tid Scan"])
-        if(plan != "error"):
-            alternate_root = self.build_tree(plan)
-            #print("NL join: ",root.check_for_join_type())
-            self.query_plans["alternative_plans"].append(alternate_root)
+        plan = self.executeQuery(query, ["Seq Scan", "Bitmap Scan"])
+        plan_type = "Index Scan"
+        self.addToAlternatePlans(plan, plan_type)
 
         # Bitmap Scan
-        plan = self.executeQuery(query, ["Seq Scan", "Index Scan", "Index Only Scan", "Tid Scan"])
-        if(plan != "error"):
-            alternate_root = self.build_tree(plan)
-            #print("NL join: ",root.check_for_join_type())
-            self.query_plans["alternative_plans"].append(alternate_root)
-        
-        # Index Only Scan
-        plan = self.executeQuery(query, ["Seq Scan", "Index Scan", "Bitmap Scan", "Tid Scan"])
-        if(plan != "error"):
-            alternate_root = self.build_tree(plan)
-            #print("NL join: ",root.check_for_join_type())
-            self.query_plans["alternative_plans"].append(alternate_root)
-
-        # Tid Only Scan
-        plan = self.executeQuery(query, ["Seq Scan", "Index Scan", "Bitmap Scan", "Index Only Scan"])
-        if(plan != "error"):
-            alternate_root = self.build_tree(plan)
-            #print("NL join: ",root.check_for_join_type())
-            self.query_plans["alternative_plans"].append(alternate_root)
-
-        # Checking for AEP for Sort
-        # Sort
-        plan = self.executeQuery(query, ["Sort"])
-        if(plan != "error"):
-            alternate_root = self.build_tree(plan)
-            #print("NL join: ",root.check_for_join_type())
-            self.query_plans["alternative_plans"].append(alternate_root)
-
-        # Checking for AEP for Others
-        # No Hash Agg
-        plan = self.executeQuery(query, ["Hash Agg"])
-        if(plan != "error"):
-            alternate_root = self.build_tree(plan)
-            #print("NL join: ",root.check_for_join_type())
-            self.query_plans["alternative_plans"].append(alternate_root)
-
-        # No Material
-        plan = self.executeQuery(query, ["Material"])
-        if(plan != "error"):
-            alternate_root = self.build_tree(plan)
-            #print("NL join: ",root.check_for_join_type())
-            self.query_plans["alternative_plans"].append(alternate_root)
+        plan = self.executeQuery(query, ["Seq Scan", "Index Scan"])
+        plan_type = "Bitmap Scan"
+        self.addToAlternatePlans(plan, plan_type)
 
         # Final print
         print("length: ", len(self.query_plans['alternative_plans']))
-
+        self.preAnnotation(self.query_plans["chosen_plan"][1])
 
 
 

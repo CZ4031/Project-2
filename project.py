@@ -12,7 +12,7 @@ if __name__ == "__main__":
 
     # Setting up connection and queries
     connect = SetUp()
-    with open('query1.txt', 'r') as file:
+    with open('query3.txt', 'r') as file:
         data = file.read().replace('\n', ' ')
     query = data
     #query = "SELECT * FROM customer"
@@ -28,13 +28,14 @@ if __name__ == "__main__":
 
     #Printing best plan tree
     print("-------------------Best plan operator tree--------------")
-    print(connect.query_plans['chosen_plan'].print_tree())
+    print(connect.query_plans['chosen_plan'][1].print_tree())
 
     #Printing AEP plan tree
     print("-----------------Alternative plan operator tree----------------")
     for plan in connect.query_plans['alternative_plans']:
-        print(plan.print_tree())
+        print(plan[1].print_tree())
         print("--------------------------------------------")
+    
 
     # close cursor
     connect.cursor.close()
