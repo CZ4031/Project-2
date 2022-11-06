@@ -8,6 +8,8 @@ from pathlib import Path
 #from tkinter import *
 # Explicit imports to satisfy Flake8
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
+from tkinter import *
+#from tkinter.ttk import *
 
 #Functions for the appication
 def delete():
@@ -17,9 +19,23 @@ def submitSQL():
     query = entry_1.get("1.0", "end-1c")
     print(query)
 
+def displayAnnotation():
+    newWindow = Toplevel(window)
+    # Toplevel widget
+    newWindow.title("QEP")
+ 
+    # sets the geometry of toplevel
+    newWindow.geometry("600x600")
+    Label(newWindow,
+          text ="Alternative Query Plan").pack()
+    displayTree = Text(newWindow,height = 100,width=100,bg="light cyan")
+    displayTree.pack()
+
+    
+
 #The GUI Elements of the database project
 window = Tk()
-
+window.title("CZ4031 Database Project 2")
 window.geometry("843x891")
 window.configure(bg = "#FFFFFF")
 
@@ -212,7 +228,7 @@ button_3 = Button(
     image=button_image_3,
     borderwidth=0,
     highlightthickness=0,
-    command=lambda: print("button_3 clicked"),
+    command= displayAnnotation,
     relief="flat"
 )
 button_3.place(
