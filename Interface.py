@@ -135,6 +135,7 @@ class projectWindow(tk.Tk):
 
 
     def onObjectClick(self, event):
+        self.annoStr.set(self.dictExtraToID[event.widget.find_closest(event.x, event.y)[0]])
         if(self.dictExtraToID[event.widget.find_closest(event.x, event.y)[0]] != ""):
             self.open_popup(self.dictExtraToID[event.widget.find_closest(event.x, event.y)[0]])
 
@@ -148,7 +149,7 @@ class projectWindow(tk.Tk):
     def open_popup(self, text:str):
         top=tk.Toplevel(self)
         top.title("Annotation")
-        lbl = tk.Label(top, text=text, font=('Mistral 18 bold'))
+        lbl = tk.Label(top, text=text, font=('Mistral 18 bold'), wraplength=300)
         lbl.pack()
         btn = tk.Button(top, text="Close", command=top.destroy)
         btn.pack()
@@ -156,11 +157,6 @@ class projectWindow(tk.Tk):
     def drawCanvasPlan(self, root: SimpleNode):
         self.planCanvas.delete("all")
         self.dictExtraToID = {}
-        #o = self.planCanvas.create_rectangle(150, 10, 100, 60)
-        #self.planCanvas.tag_bind(o, '<ButtonPress-1>', self.onObjectClick)
-
-        #self.createTextRectangle("testlolola", self.planCanvas, 300, 300)
-
 
         rootD = createDisplayNode(root)
 
@@ -203,7 +199,7 @@ class projectWindow(tk.Tk):
         rootS = SimpleNode()
 
         rootS.value="TEST"
-        rootS.annotations="LOL"
+        rootS.annotations="LOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOL"
 
         node1 = SimpleNode()
         node1.value = "1"
@@ -247,6 +243,11 @@ class projectWindow(tk.Tk):
         queryTextBox = tk.Text(inputFrame, height=4, width=20)
         queryTextBox.pack()
 
+        annoLabel = tk.Label(inputFrame, text="Annotation:")
+        annoLabel.pack()
+        self.annoStr = tk.StringVar()
+        annoMsg = tk.Label(inputFrame, textvariable = self.annoStr, wraplength=150)
+        annoMsg.pack()
         self.resizable(False, False)
 
 
