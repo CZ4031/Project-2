@@ -1,7 +1,9 @@
 from pathlib import Path
-from types import NoneType
+#from types import NoneType
+NoneType = type(None)
 
 from typing import Tuple, Union
+from preprocessing import *
 
 #from tkinter import *
 # Explicit imports to satisfy Flake8
@@ -181,6 +183,14 @@ class projectWindow(tk.Tk):
         print("QUERY:", self.queryTextBox.get("1.0",'end-1c'))
 
     def processLogin(self):
+        self.connect = SetUp(self.ipEntry.get(), self.portEntry.get(), self.dbNameEntry.get(), self.userEntry.get(), self.pwdEntry.get())
+        #query = "SELECT * FROM customer"
+        with open('query3.txt', 'r') as file:
+            data = file.read().replace('\n', ' ')
+        query = data
+        self.connect.getAllQueryPlans(query)
+        print("-------------------Best plan operator tree--------------")
+        print(self.connect.query_plans['chosen_plan'][1].print_tree())
         print("IP:", self.ipEntry.get())
         print("PORT:", self.portEntry.get())
         print("USER:", self.userEntry.get())
