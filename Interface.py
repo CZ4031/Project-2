@@ -127,6 +127,9 @@ class projectWindow(tk.Tk):
         self.dbNameEntry = tk.Entry(dbNameFrame)
         self.dbNameEntry.pack(side=tk.RIGHT)
 
+        loginBtn = tk.Button(self.sqlLabelFrame, text="LOGIN", command=self.processLogin)
+        loginBtn.pack()
+
     def scroll_move(self, event):
         self.planCanvas.scan_dragto(event.x, event.y, gain=1)
             
@@ -176,6 +179,8 @@ class projectWindow(tk.Tk):
 
     def processQuery(self):
         print("QUERY:", self.queryTextBox.get("1.0",'end-1c'))
+
+    def processLogin(self):
         print("IP:", self.ipEntry.get())
         print("PORT:", self.portEntry.get())
         print("USER:", self.userEntry.get())
