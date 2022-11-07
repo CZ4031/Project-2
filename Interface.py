@@ -104,28 +104,28 @@ class projectWindow(tk.Tk):
 
         ipLabel = tk.Label(ipFrame, text="IP address: ")
         ipLabel.pack(side=tk.LEFT)
-        ipEntry = tk.Entry(ipFrame)
-        ipEntry.pack(side=tk.RIGHT)
+        self.ipEntry = tk.Entry(ipFrame)
+        self.ipEntry.pack(side=tk.RIGHT)
 
         portLabel = tk.Label(portFrame, text="Port: ")
         portLabel.pack(side=tk.LEFT)
-        portEntry = tk.Entry(portFrame)
-        portEntry.pack(side=tk.RIGHT)
+        self.portEntry = tk.Entry(portFrame)
+        self.portEntry.pack(side=tk.RIGHT)
 
         userLabel = tk.Label(userFrame, text="Username: ")
         userLabel.pack(side=tk.LEFT)
-        userEntry = tk.Entry(userFrame)
-        userEntry.pack(side=tk.RIGHT)
+        self.userEntry = tk.Entry(userFrame)
+        self.userEntry.pack(side=tk.RIGHT)
 
         pwdLabel = tk.Label(pwdFrame, text="Password: ")
         pwdLabel.pack(side=tk.LEFT)
-        pwdEntry = tk.Entry(pwdFrame)
-        pwdEntry.pack(side=tk.RIGHT)
+        self.pwdEntry = tk.Entry(pwdFrame)
+        self.pwdEntry.pack(side=tk.RIGHT)
 
         dbNameLabel = tk.Label(dbNameFrame, text="Database name: ")
         dbNameLabel.pack(side=tk.LEFT)
-        dbNameEntry = tk.Entry(dbNameFrame)
-        dbNameEntry.pack(side=tk.RIGHT)
+        self.dbNameEntry = tk.Entry(dbNameFrame)
+        self.dbNameEntry.pack(side=tk.RIGHT)
 
     def scroll_move(self, event):
         self.planCanvas.scan_dragto(event.x, event.y, gain=1)
@@ -175,7 +175,13 @@ class projectWindow(tk.Tk):
                 self.planCanvas.create_line((curNode.left_bound*200 + curNode.right_bound*200)/2, curNode.depth * 100 + 50 - 25, (curTup[1].left_bound*200 + curTup[1].right_bound*200)/2, (curNode.depth-1) * 100 + 50 + 25)
 
     def processQuery(self):
-        print("TEST: ", self.queryTextBox.get("1.0",'end-1c'))
+        print("QUERY:", self.queryTextBox.get("1.0",'end-1c'))
+        print("IP:", self.ipEntry.get())
+        print("PORT:", self.portEntry.get())
+        print("USER:", self.userEntry.get())
+        print("PWD:", self.pwdEntry.get())
+        print("DB NAME:", self.dbNameEntry.get())
+
     
     def __init__(self):
         super().__init__()
