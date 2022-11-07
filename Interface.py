@@ -149,7 +149,7 @@ class projectWindow(tk.Tk):
     def open_popup(self, text:str):
         top=tk.Toplevel(self)
         top.title("Annotation")
-        lbl = tk.Label(top, text=text, font=('Mistral 18 bold'), wraplength=300)
+        lbl = tk.Label(top, text=text, font=('Arial', 12, ''), wraplength=300)
         lbl.pack()
         btn = tk.Button(top, text="Close", command=top.destroy)
         btn.pack()
@@ -174,6 +174,9 @@ class projectWindow(tk.Tk):
             if(curTup[1] != None):
                 self.planCanvas.create_line((curNode.left_bound*200 + curNode.right_bound*200)/2, curNode.depth * 100 + 50 - 25, (curTup[1].left_bound*200 + curTup[1].right_bound*200)/2, (curNode.depth-1) * 100 + 50 + 25)
 
+    def processQuery(self):
+        print("TEST: ", self.queryTextBox.get("1.0",'end-1c'))
+    
     def __init__(self):
         super().__init__()
         self.dictExtraToID = {}
@@ -240,8 +243,11 @@ class projectWindow(tk.Tk):
         queryLabel = tk.Label(inputFrame, text="Query:")
         queryLabel.pack(anchor=tk.W)
 
-        queryTextBox = tk.Text(inputFrame, height=4, width=20)
-        queryTextBox.pack()
+        self.queryTextBox = tk.Text(inputFrame, height=4, width=20)
+        self.queryTextBox.pack()
+
+        processBtn = tk.Button(inputFrame, text="Process query", command=self.processQuery)
+        processBtn.pack()
 
         annoLabel = tk.Label(inputFrame, text="Annotation:")
         annoLabel.pack()
