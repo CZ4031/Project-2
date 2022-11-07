@@ -95,13 +95,15 @@ class SetUp():
 
 
     # , host, port_num, database_name, username, password
-    def __init__(self):
+    def __init__(self, host, port_num, database_name, username, password):
         # Setting up connection
         self.connection = None
         try:
-            self.connection = psycopg2.connect(host = config("HOST"), port = config("PORT") ,database= config("DATABASE"), user= config("USER"), password= config("PASSWORD"))
+            self.connection = psycopg2.connect(host = host, port = port_num,database= database_name, user= username, password= password)
+            #self.connection = psycopg2.connect(host = config("HOST"), port = config("PORT") ,database= config("DATABASE"), user= config("USER"), password= config("PASSWORD"))
             self.verify = True
             if(self.verify):
+                print("Connected")
                 self.cursor = self.connection.cursor()
         except (Exception, psycopg2.DatabaseError):
             self.verify = False
