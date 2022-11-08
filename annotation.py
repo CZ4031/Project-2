@@ -1,13 +1,13 @@
 class Annotation:
 	def traverseTree(self, root):
-		node = root
 		if not root:
 			return
-		while not node.children:
-			for child in node.children:
-				self.generateAnnotation(node)
-				node = child
-		return
+		
+		self.generateAnnotation(root)
+
+		if root.children:
+			for child in root.children:
+				self.traverseTree(child)
 
 	def generateAnnotation(self, node):
 		for attribute in node.attributes:
