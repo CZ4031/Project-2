@@ -1,17 +1,20 @@
 from preprocessing import *
+from Interface import *
 
 
 
 if __name__ == "__main__":
+    app = projectWindow()
+    app.mainloop()
     # username = "postgres"
     # password = ""
     # database_name = "TPC-H"
 
 
-    print("Welcome to CZ4003 database")
+    # print("Welcome to CZ4003 database")
 
-    # Setting up connection and queries
-    connect = SetUp()
+    # # Setting up connection and queries
+    # connect = SetUp()
     # with open('query3.txt', 'r') as file:
     #     data = file.read().replace('\n', ' ')
     # query = data

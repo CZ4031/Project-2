@@ -30,15 +30,15 @@ import tkinter as tk
 #    displayTree = Text(newWindow,height = 100,width=100,bg="light cyan")
 #    displayTree.pack()
 
-class SimpleNode():
+# class SimpleNode():
 
-    # Construct a node
-    def __init__(self) -> None:
-        self.children: list[SimpleNode] = []
-        self.value = ""
-        self.annotations = ""
+#     # Construct a node
+#     def __init__(self) -> None:
+#         self.children: list[SimpleNode] = []
+#         self.value = ""
+#         self.annotations = ""
 
-def countLeafNodes(node: SimpleNode):
+def countLeafNodes(node: PlanNode):
     leafNodesNum = 0
     queue = [node]
     while(len(queue) > 0):
@@ -61,14 +61,14 @@ class DisplayNode():
         self.left_bound:int = 0
         self.right_bound:int = 0
 
-def createDisplayNode(root: SimpleNode):
+def createDisplayNode(root: PlanNode):
     maxBound = countLeafNodes(root)
     rootDisplay = DisplayNode()
     rootDisplay.left_bound = 0
     rootDisplay.right_bound = maxBound
-    rootDisplay.text = root.value
+    rootDisplay.text = root.attributes['Node Type']
     rootDisplay.annotations = root.annotations
-    nodeQueue:list[Tuple[DisplayNode, SimpleNode, Tuple[int, int]]] = [] # tuple of (displayNode parent, node child)
+    nodeQueue:list[Tuple[DisplayNode, PlanNode, Tuple[int, int]]] = [] # tuple of (displayNode parent, node child)
     if(len(root.children) == 1):
         nodeQueue.append((rootDisplay, root.children[0], (0, maxBound)))
     elif(len(root.children) == 2):
@@ -79,7 +79,7 @@ def createDisplayNode(root: SimpleNode):
         newChild = DisplayNode()
         newChild.left_bound = curNode[2][0]
         newChild.right_bound = curNode[2][1]
-        newChild.text = curNode[1].value
+        newChild.text = curNode[1].attributes['Node Type']
         newChild.annotations = curNode[1].annotations
         newChild.depth = curNode[0].depth + 1
         # append to parent
@@ -140,9 +140,14 @@ class projectWindow(tk.Tk):
 
 
     def onObjectClick(self, event):
-        self.annoStr.set(self.dictExtraToID[event.widget.find_closest(event.x, event.y)[0]])
-        if(self.dictExtraToID[event.widget.find_closest(event.x, event.y)[0]] != ""):
-            self.open_popup(self.dictExtraToID[event.widget.find_closest(event.x, event.y)[0]])
+        x = event.widget.canvasx(event.x)
+        y = event.widget.canvasy(event.y)
+        self.annoStr.set(self.dictExtraToID[event.widget.find_closest(x, y)[0]])
+        if(self.dictExtraToID[event.widget.find_closest(x, y)[0]] != ""):
+            self.open_popup(self.dictExtraToID[event.widget.find_closest(x, y)[0]])
+        # self.annoStr.set(self.dictExtraToID[event.widget.find_closest(event.x, event.y)[0]])
+        # if(self.dictExtraToID[event.widget.find_closest(event.x, event.y)[0]] != ""):
+        #     self.open_popup(self.dictExtraToID[event.widget.find_closest(event.x, event.y)[0]])
 
     def createTextRectangle(self, text: str, canvas: tk.Canvas, x0: int, y0: int):
         rectangle = canvas.create_rectangle(x0, y0, x0+100, y0+50, fill = "#FFFFFF")
@@ -159,7 +164,7 @@ class projectWindow(tk.Tk):
         btn = tk.Button(top, text="Close", command=top.destroy)
         btn.pack()
 
-    def drawCanvasPlan(self, root: SimpleNode):
+    def drawCanvasPlan(self, root: PlanNode):
         self.planCanvas.delete("all")
         self.dictExtraToID = {}
 
@@ -180,17 +185,19 @@ class projectWindow(tk.Tk):
                 self.planCanvas.create_line((curNode.left_bound*200 + curNode.right_bound*200)/2, curNode.depth * 100 + 50 - 25, (curTup[1].left_bound*200 + curTup[1].right_bound*200)/2, (curNode.depth-1) * 100 + 50 + 25)
 
     def processQuery(self):
+        with open('query3.txt', 'r') as file:
+            data = file.read().replace('\n', ' ')
+        query = data
+        self.connect.getAllQueryPlans(query)
+        self.drawCanvasPlan(self.connect.query_plans['chosen_plan'][1])
         print("QUERY:", self.queryTextBox.get("1.0",'end-1c'))
 
     def processLogin(self):
         self.connect = SetUp(self.ipEntry.get(), self.portEntry.get(), self.dbNameEntry.get(), self.userEntry.get(), self.pwdEntry.get())
         #query = "SELECT * FROM customer"
-        with open('query3.txt', 'r') as file:
-            data = file.read().replace('\n', ' ')
-        query = data
-        self.connect.getAllQueryPlans(query)
-        print("-------------------Best plan operator tree--------------")
-        print(self.connect.query_plans['chosen_plan'][1].print_tree())
+       
+        # print("-------------------Best plan operator tree--------------")
+        # print(self.connect.query_plans['chosen_plan'][1].print_tree())
         print("IP:", self.ipEntry.get())
         print("PORT:", self.portEntry.get())
         print("USER:", self.userEntry.get())
@@ -220,38 +227,36 @@ class projectWindow(tk.Tk):
         self.planCanvas.pack()
 
 
-        rootS = SimpleNode()
+        # rootS = SimpleNode()
 
-        rootS.value="TEST"
-        rootS.annotations="LOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOL"
+        # rootS.value="TEST"
+        # rootS.annotations="LOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOL"
 
-        node1 = SimpleNode()
-        node1.value = "1"
+        # node1 = SimpleNode()
+        # node1.value = "1"
 
-        node2 = SimpleNode()
-        node2.value = "2"
-        rootS.children.append(node1)
-        rootS.children.append(node2)
+        # node2 = SimpleNode()
+        # node2.value = "2"
+        # rootS.children.append(node1)
+        # rootS.children.append(node2)
 
-        node3 = SimpleNode()
-        node3.value = "3"
+        # node3 = SimpleNode()
+        # node3.value = "3"
 
-        node4 = SimpleNode()
-        node4.value = "4"
+        # node4 = SimpleNode()
+        # node4.value = "4"
 
-        node1.children.append(node3)
-        node1.children.append(node4)
+        # node1.children.append(node3)
+        # node1.children.append(node4)
 
-        node5 = SimpleNode()
-        node5.value = "5"
+        # node5 = SimpleNode()
+        # node5.value = "5"
 
-        node6 = SimpleNode()
-        node6.value = "6"
+        # node6 = SimpleNode()
+        # node6.value = "6"
 
-        node4.children.append(node5)
-        node4.children.append(node6)
-
-        self.drawCanvasPlan(rootS)
+        # node4.children.append(node5)
+        # node4.children.append(node6)
 
         self.planCanvas.bind("<ButtonPress-1>", self.scroll_start)
         self.planCanvas.bind("<B1-Motion>", self.scroll_move)
@@ -279,6 +284,6 @@ class projectWindow(tk.Tk):
 
 
 
-if __name__ == "__main__":
-    app = projectWindow()
-    app.mainloop()
+# if __name__ == "__main__":
+#     app = projectWindow()
+#     app.mainloop()
