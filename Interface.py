@@ -4,6 +4,7 @@ NoneType = type(None)
 
 from typing import Tuple, Union
 from preprocessing import *
+from annotation import *
 
 #from tkinter import *
 # Explicit imports to satisfy Flake8
@@ -189,6 +190,11 @@ class projectWindow(tk.Tk):
             data = file.read().replace('\n', ' ')
         query = data
         self.connect.getAllQueryPlans(query)
+        print(self.connect.query_plans['chosen_plan'][1].print_tree())
+
+        annotation = Annotation()
+        annotation.traverseTree(self.connect.query_plans['chosen_plan'][1])
+
         self.drawCanvasPlan(self.connect.query_plans['chosen_plan'][1])
         print("QUERY:", self.queryTextBox.get("1.0",'end-1c'))
 

@@ -6,7 +6,7 @@
 from cgi import test
 from cgitb import text
 import psycopg2
-from decouple import config
+# from decouple import config
 import json
 
 class PlanNode():
@@ -236,13 +236,15 @@ class SetUp():
                 if "Join" in node.attributes['Node Type'] or "Loop" in node.attributes['Node Type']:
                     for alternate_nodes in self.query_plans["alternative_plans"]:
                         if ("Join" in alternate_nodes[0] or "Loop" in alternate_nodes[0]) and (alternate_nodes[0] != node.attributes['Node Type']):
-                            # total alternate plan cost / total optimal plan cost
-                            node.alternate_plans[alternate_nodes[0]] = alternate_nodes[2]/self.query_plans["chosen_plan"][2]
+                            if (alternate_nodes[2] > self.query_plans["chosen_plan"][2]):
+                                # total alternate plan cost / total optimal plan cost
+                                node.alternate_plans[alternate_nodes[0]] = alternate_nodes[2]/self.query_plans["chosen_plan"][2]
                 elif "Scan" in node.attributes['Node Type']:
                     for alternate_nodes in self.query_plans["alternative_plans"]:
                         if "Scan" in alternate_nodes[0] and (alternate_nodes[0] != node.attributes['Node Type']):
-                            # total alternate plan cost / total optimal plan cost
-                            node.alternate_plans[alternate_nodes[0]] = alternate_nodes[2]/self.query_plans["chosen_plan"][2]
+                            if (alternate_nodes[2] > self.query_plans["chosen_plan"][2]):
+                                # total alternate plan cost / total optimal plan cost
+                                node.alternate_plans[alternate_nodes[0]] = alternate_nodes[2]/self.query_plans["chosen_plan"][2]
                 for child in node.children:
                     queue.append(child)
 
