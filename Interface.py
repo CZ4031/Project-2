@@ -1,3 +1,4 @@
+from math import floor
 from pathlib import Path
 from types import NoneType
 
@@ -6,6 +7,7 @@ from typing import Tuple, Union
 #from tkinter import *
 # Explicit imports to satisfy Flake8
 import tkinter as tk
+from tkinter import font
 #from tkinter.ttk import *
 
 #Functions for the appication
@@ -138,13 +140,16 @@ class projectWindow(tk.Tk):
 
 
     def onObjectClick(self, event):
-        self.annoStr.set(self.dictExtraToID[event.widget.find_closest(event.x, event.y)[0]])
-        if(self.dictExtraToID[event.widget.find_closest(event.x, event.y)[0]] != ""):
-            self.open_popup(self.dictExtraToID[event.widget.find_closest(event.x, event.y)[0]])
+        x = event.widget.canvasx(event.x)
+        y = event.widget.canvasy(event.y)
+        self.annoStr.set(self.dictExtraToID[event.widget.find_closest(x, y)[0]])
+        if(self.dictExtraToID[event.widget.find_closest(x, y)[0]] != ""):
+            self.open_popup(self.dictExtraToID[event.widget.find_closest(x, y)[0]])
 
     def createTextRectangle(self, text: str, canvas: tk.Canvas, x0: int, y0: int):
         rectangle = canvas.create_rectangle(x0, y0, x0+100, y0+50, fill = "#FFFFFF")
         textline = canvas.create_text(x0+50, y0+25, text=text, justify = 'center')
+        self.textBoxes.append(textline)
         self.planCanvas.tag_bind(rectangle, '<ButtonPress-1>', self.onObjectClick)
         self.planCanvas.tag_bind(textline, '<ButtonPress-1>', self.onObjectClick)
         return (rectangle, textline)
@@ -160,6 +165,8 @@ class projectWindow(tk.Tk):
     def drawCanvasPlan(self, root: SimpleNode):
         self.planCanvas.delete("all")
         self.dictExtraToID = {}
+        self.scale = 0
+        self.textBoxes = []
 
         rootD = createDisplayNode(root)
 
@@ -187,10 +194,37 @@ class projectWindow(tk.Tk):
         print("PWD:", self.pwdEntry.get())
         print("DB NAME:", self.dbNameEntry.get())
 
+    def centreCanvas(self):
+        self.planCanvas.scale("all",0,0,pow(0.8, self.scale),pow(0.8, self.scale))
+        self.planCanvas.xview_moveto(0.5)
+        self.planCanvas.yview_moveto(0)
+        writingFont = font.nametofont("TkDefaultFont").copy()
+        for text in self.textBoxes:
+            self.planCanvas.itemconfig(text, font = writingFont)
+
+        self.scale = 0
+
+    def zoomIn(self):
+        self.scale +=1
+        self.planCanvas.scale("all",0,0,1.25,1.25)
+        writingFont = font.nametofont("TkDefaultFont").copy()
+        writingFont.config(size = floor(writingFont.cget("size") * pow(1.1, self.scale)))
+        for text in self.textBoxes:
+            self.planCanvas.itemconfig(text, font = writingFont)
+
+    def zoomOut(self):
+        self.scale -=1
+        self.planCanvas.scale("all",0,0,0.8,0.8)
+        writingFont = font.nametofont("TkDefaultFont").copy()
+        writingFont.config(size = floor(writingFont.cget("size") * pow(1.1, self.scale)))
+        for text in self.textBoxes:
+            self.planCanvas.itemconfig(text, font = writingFont)
     
     def __init__(self):
         super().__init__()
+        self.scale = 0
         self.dictExtraToID = {}
+        self.textBoxes = []
         self.title("CZ4031 Database Project 2")
         #window.geometry("843x891")
         #window.configure(bg = "#FFFFFF")
@@ -204,12 +238,24 @@ class projectWindow(tk.Tk):
         planFrame = tk.Frame(self)
         planFrame.pack(side=tk.RIGHT)
 
-        planLabel = tk.Label(planFrame, text="Query:")
-        planLabel.pack(anchor=tk.W)
+        planInfoFrame = tk.Frame(planFrame)
+        planInfoFrame.pack()
+        planLabel = tk.Label(planInfoFrame, text="Query:")
+        planLabel.pack(side=tk.LEFT)
+        centreBtn = tk.Button(planInfoFrame, text="RESET VIEW", command=self.centreCanvas)
+        centreBtn.pack(side=tk.RIGHT)
+        zoomFrame = tk.Frame(planFrame)
+        zoomFrame.pack()
+
+        zoomInBtn = tk.Button(zoomFrame, text = "Zoom In", command=self.zoomIn)
+        zoomInBtn.pack(side=tk.LEFT)
+        zoomOutBtn = tk.Button(zoomFrame, text = "Zoom Out", command=self.zoomOut)
+        zoomOutBtn.pack(side=tk.RIGHT)
+
         self.planCanvas = tk.Canvas(planFrame, height=600, width=600, bg="#FFFFFF")
         self.planCanvas.pack()
 
-
+        
         rootS = SimpleNode()
 
         rootS.value="TEST"
@@ -243,6 +289,8 @@ class projectWindow(tk.Tk):
 
         self.drawCanvasPlan(rootS)
 
+        #self.planCanvas.scale("all", 0,0,0.5,0.5)
+
         self.planCanvas.bind("<ButtonPress-1>", self.scroll_start)
         self.planCanvas.bind("<B1-Motion>", self.scroll_move)
 
@@ -259,6 +307,8 @@ class projectWindow(tk.Tk):
 
         processBtn = tk.Button(inputFrame, text="Process query", command=self.processQuery)
         processBtn.pack()
+
+        
 
         annoLabel = tk.Label(inputFrame, text="Annotation:")
         annoLabel.pack()
