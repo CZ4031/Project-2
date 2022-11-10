@@ -117,8 +117,6 @@ class SetUp():
             cursor.execute(self.off_config["Tid Scan"])
             cursor.execute(self.off_config["Index Only Scan"])
             for condition in off:
-                #print(self.off_config[condition])
-                # 5s timeout
                 cursor.execute(self.off_config[condition])
             
             cursor.execute(optimalQEP)
@@ -297,7 +295,7 @@ class SetUp():
         self.addToAlternatePlans(plan, plan_type)
 
         # Final print
-        print("length: ", len(self.query_plans['alternative_plans']))
+        #print("length: ", len(self.query_plans['alternative_plans']))
         self.preAnnotation(self.query_plans["chosen_plan"][1])
 
 
