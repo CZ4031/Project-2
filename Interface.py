@@ -11,10 +11,10 @@ from annotation import *
 # Explicit imports to satisfy Flake8
 import tkinter as tk
 from tkinter import font
+from tkinter import messagebox
 #from tkinter.ttk import *
 
 #Functions for the appication
-
 
 def countLeafNodes(node: PlanNode):
     leafNodesNum = 0
@@ -71,6 +71,7 @@ def createDisplayNode(root: PlanNode):
 
 class projectWindow(tk.Tk):
     def createLoginDetails(self):
+        # Labelling frames
         ipFrame = tk.Frame(self.sqlLabelFrame)
         ipFrame.pack(anchor=tk.W)
         portFrame = tk.Frame(self.sqlLabelFrame)
@@ -81,7 +82,8 @@ class projectWindow(tk.Tk):
         userFrame.pack(anchor=tk.W)
         pwdFrame = tk.Frame(self.sqlLabelFrame)
         pwdFrame.pack(anchor=tk.W)
-
+          
+        # Auto filling certain labels
         ipLabel = tk.Label(ipFrame, text="IP address: ")
         ipLabel.pack(side=tk.LEFT)
         self.ipEntry = tk.Entry(ipFrame)
@@ -172,20 +174,65 @@ class projectWindow(tk.Tk):
         # with open('query3.txt', 'r') as file:
         #     data = file.read().replace('\n', ' ')
         # query = data
+        
+        # Check if user logged in correctly
+        
+        if not self.connect.verify:
+            messagebox.showerror(
+                title="Warning", message="User is not Logged In. Try Again")
+            return
+
+        # User logged in correctly
+        print("query entered: ", self.queryTextBox.get(1.0, "end-1c"))
         self.connect.getAllQueryPlans(self.queryTextBox.get(1.0, "end-1c"))
+
+        # SQL Statement is wrong
         if(self.connect.queryError):
             print("Please check your sql statements")
+            messagebox.showerror(
+                title="Warning", message="Please check your sql statement entered.")
             return
+
+         # Clear query
+        self.queryTextBox.delete(1.0, "end")
+
         print(self.connect.query_plans['chosen_plan'][1].print_tree())
 
         annotation = Annotation()
         annotation.traverseTree(self.connect.query_plans['chosen_plan'][1])
 
+        # Draw optimal query tree
         self.drawCanvasPlan(self.connect.query_plans['chosen_plan'][1])
-        print("QUERY:", self.queryTextBox.get("1.0",'end-1c'))
+
 
     def processLogin(self):
+        # Checking if entry labels are empty in case user did not enter
+        typesOfEntry = []
+        typesOfEntry.extend([self.ipEntry, self.portEntry,
+                            self.userEntry, self.pwdEntry, self.dbNameEntry])
+        isEmpty = False
+        for i in typesOfEntry:
+            if len(i.get()) == 0:
+                isEmpty = True
+        if isEmpty:
+            messagebox.showerror(
+                title="Warning", message="Please fill All Empty Fields")
+            return
+
+        # Establishing connection
         self.connect = SetUp(self.ipEntry.get(), self.portEntry.get(), self.dbNameEntry.get(), self.userEntry.get(), self.pwdEntry.get())
+
+        # Checking if login credentials are correct
+       
+        if not self.connect.verify:
+            messagebox.showerror(
+                title="Warning", message="User is not Logged In. Try Again")
+            return
+
+        messagebox.showinfo(
+            title="Success", message="Use is logged in!!")
+        
+
         #query = "SELECT * FROM customer"
        
         # print("-------------------Best plan operator tree--------------")
