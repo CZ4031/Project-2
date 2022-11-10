@@ -107,7 +107,7 @@ class SetUp():
             self.verify = False
 
     def executeQuery(self, query, off=[]):
-        optimalQEP = "EXPLAIN (VERBOSE, COSTS, FORMAT JSON)" + query.strip()
+        optimalQEP = "EXPLAIN (VERBOSE, COSTS, FORMAT JSON)" + query.strip('\n')
 
         try:
             # set cursor variable
@@ -141,6 +141,7 @@ class SetUp():
                 message = "Please check your sql statement: \n" + query
                 print(message)
                 self.queryError = True
+                self.connection.rollback()
                 return "error"
        
 
