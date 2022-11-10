@@ -55,35 +55,80 @@ class Annotation:
 
 		# For joins
 		if nodeType == "Hash Join":
-			annotation = "Hash join is done on tables XX and YY on the conditions AA, to get resulting table BB.\n"
+			cond = node.attributes['Hash Cond']
+			try:
+				cond = cond.replace(" ", "")
+				cond = cond.lstrip("(").rstrip(")")
+				condsplit = cond.split('.')
+				table1 = condsplit[0]
+				condsplit2 = condsplit[1].split('=')
+				table2 = condsplit2[1]
+				annotation = "Hash join is performed on tables {} and {}, with the conditions {}.\n".format(table1, table2, cond)
+			except:
+				annotation = "Hash join is performed with the conditions {}.\n".format(cond)
 			node.annotations += annotation
 			self.comparison(node)
 
 		if nodeType == "Merge Join":
-			annotation = "Merge join is done on tables XX and YY on the conditions AA, to get resulting table BB.\n"
+			cond = node.attributes['Merge Cond']
+			try:
+				cond = cond.replace(" ", "")
+				cond = cond.lstrip("(").rstrip(")")
+				condsplit = cond.split('.')
+				table1 = condsplit[0]
+				condsplit2 = condsplit[1].split('=')
+				table2 = condsplit2[1]
+				annotation = "Merge join is performed on tables {} and {}, with the conditions {}.\n".format(table1, table2, cond)
+			except:
+				annotation = "Merge join is performed with the conditions {}.\n".format(cond)
 			node.annotations += annotation
 			self.comparison(node)
 
 		if nodeType == "Nested Loop":
-			annotation = "Nested Loop join is done on tables XX and YY on the conditions AA, to get resulting table BB.\n"
-			node.annotations += annotation
+			node.annotations += "Nested Loop join is performed.\n"
 			self.comparison(node)
 
 		# All other operators
 		if nodeType == "Hash":
-			annotation = "Perform hashing on table.\n"
+			if "Output" in node.attributes:
+				output = node.attributes['Output']
+				temp = output[0].split('.')
+				temp1 = temp[0]
+				annotation = "Perform hashing on table {}.\n".format(temp1)
+			else:	
+				annotation = "Perform hashing on table.\n"
 			node.annotations += annotation
 
 		if nodeType == "Aggregate":
 			strategy = node.attributes['Strategy']
 			if strategy == "Sorted":
-				annotation = "The Aggregate operation will sort the tuples based on the keys [{}].\n".format(node.attributes["Group Key"])
-				# if "Filter" in plans[i]:
-				# 	annotated += 'The result is then filtered by [{}]. '.format(plans[i]['Filter'])
-			if strategy == "Plain":
+				if "Group Key" in node.attributes:
+					group_key = node.attributes['Group Key']
+					temp = group_key[0].split('.')
+					table = temp[0]
+					list_of_keys = []
+					for key in group_key:
+						temp = key.split('.')
+						list_of_keys.append(temp[1])
+					stringOfKeys = ' '.join(list_of_keys)
+					annotation = "The Sort Aggregate operation will be performed on table {}, with grouping on {}.\n".format(table, stringOfKeys)
+				else:
+					annotation = "The Sort Aggregate operation will be performed.\n"
+			elif strategy == "Hashed":
+				if "Group Key" in node.attributes:
+					group_key = node.attributes['Group Key']
+					temp = group_key[0].split('.')
+					table = temp[0]
+					list_of_keys = []
+					for key in group_key:
+						temp = key.split('.')
+						list_of_keys.append(temp[1])
+					stringOfKeys = ' '.join(list_of_keys)
+					annotation = "The Hash Aggregate operation will be performed on table {}, with grouping on {}.\n".format(table, stringOfKeys)
+				else:
+					annotation = "The Hash Aggregate operation will be performed.\n"
+			else:
 				annotation = "The Aggregate operation will be performed.\n"
-			if strategy == "Hashed":
-				annotation = "The Aggregate operation will hash the rows based on keys [{}]. The selected rows are then returned.\n".format(node.attributes["Group Key"])
 			node.annotations += annotation
 
 		if nodeType == "Sort":
@@ -119,13 +164,14 @@ class Annotation:
 			annotation = "Unnecessary elements are removed and the remaining elements are projected.\n"
 			node.annotations += annotation
 
-		# if nodeType == "Bitmap Index Scan":
-		# 	annotation = "Bitmap index scan is used as multiple indices are constructed for this table.\n"
-		# 	node.annotations += annotation
-		# 	self.comparison(node)
 
-		# if nodeType == "Bitmap Heap Scan":
-		# 	annotation = "Bitmap heap scan is used as multiple indices as constructed. A heap is used to " \
-		# 					"sort the indices and quickly cut down the number of tuples scanned.\n "
-		# 	node.annotations += annotation
-		# 	self.comparison(node)
+		if nodeType == "Bitmap Index Scan":
+			annotation = "Bitmap index scan is used as multiple indices are constructed for this table.\n"
+			node.annotations += annotation
+			self.comparison(node)
+
+		if nodeType == "Bitmap Heap Scan":
+			annotation = "Bitmap heap scan is used as multiple indices as constructed. A heap is used to " \
+							"sort the indices and quickly cut down the number of tuples scanned.\n "
+			node.annotations += annotation
+			self.comparison(node)
