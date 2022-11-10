@@ -104,27 +104,30 @@ class Annotation:
 			if strategy == "Sorted":
 				if "Group Key" in node.attributes:
 					group_key = node.attributes['Group Key']
-					temp = group_key[0].split('.')
-					table = temp[0]
 					list_of_keys = []
 					for key in group_key:
-						temp = key.split('.')
-						list_of_keys.append(temp[1])
-					stringOfKeys = ' '.join(list_of_keys)
-					annotation = "The Sort Aggregate operation will be performed on table {}, with grouping on {}.\n".format(table, stringOfKeys)
+						list_of_keys.append(key)
+					stringOfKeys = ', '.join(list_of_keys)
+					if len(stringOfKeys) > 1:
+						stringOfKeys = ', '.join(list_of_keys)
+					else:
+						stringOfKeys = list_of_keys[0]
+					#print("---------------------", stringOfKeys)
+					annotation = "The Sort Aggregate operation will perform grouping on keys: {}.\n".format(stringOfKeys)
 				else:
 					annotation = "The Sort Aggregate operation will be performed.\n"
 			elif strategy == "Hashed":
 				if "Group Key" in node.attributes:
 					group_key = node.attributes['Group Key']
-					temp = group_key[0].split('.')
-					table = temp[0]
 					list_of_keys = []
 					for key in group_key:
-						temp = key.split('.')
-						list_of_keys.append(temp[1])
-					stringOfKeys = ' '.join(list_of_keys)
-					annotation = "The Hash Aggregate operation will be performed on table {}, with grouping on {}.\n".format(table, stringOfKeys)
+						list_of_keys.append(key)
+					if len(stringOfKeys) > 1:
+						stringOfKeys = ', '.join(list_of_keys)
+					else:
+						stringOfKeys = list_of_keys[0]
+					#print("---------------------", stringOfKeys)
+					annotation = "The Hash Aggregate operation will perform grouping on {}.\n".format(stringOfKeys)
 				else:
 					annotation = "The Hash Aggregate operation will be performed.\n"
 			else:
@@ -163,7 +166,6 @@ class Annotation:
 		if nodeType == "Project":
 			annotation = "Unnecessary elements are removed and the remaining elements are projected.\n"
 			node.annotations += annotation
-
 
 		if nodeType == "Bitmap Index Scan":
 			annotation = "Bitmap index scan is used as multiple indices are constructed for this table.\n"
