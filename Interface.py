@@ -1,4 +1,5 @@
 from pathlib import Path
+from math import floor
 #from types import NoneType
 NoneType = type(None)
 
@@ -9,35 +10,11 @@ from annotation import *
 #from tkinter import *
 # Explicit imports to satisfy Flake8
 import tkinter as tk
+from tkinter import font
 #from tkinter.ttk import *
 
 #Functions for the appication
-#def delete():
-#   entry_1.delete("1.0","end")
 
-#def submitSQL():
-#    query = entry_1.get("1.0", "end-1c")
-#    print(query)
-
-#def displayAnnotation():
-#    newWindow = Toplevel(window)
-#    # Toplevel widget
-#    newWindow.title("QEP")
-# 
-#    # sets the geometry of toplevel
-#    newWindow.geometry("600x600")
-#    Label(newWindow,
-#          text ="Alternative Query Plan").pack()
-#    displayTree = Text(newWindow,height = 100,width=100,bg="light cyan")
-#    displayTree.pack()
-
-# class SimpleNode():
-
-#     # Construct a node
-#     def __init__(self) -> None:
-#         self.children: list[SimpleNode] = []
-#         self.value = ""
-#         self.annotations = ""
 
 def countLeafNodes(node: PlanNode):
     leafNodesNum = 0
@@ -108,16 +85,19 @@ class projectWindow(tk.Tk):
         ipLabel = tk.Label(ipFrame, text="IP address: ")
         ipLabel.pack(side=tk.LEFT)
         self.ipEntry = tk.Entry(ipFrame)
+        self.ipEntry.insert(0, "127.0.0.1")
         self.ipEntry.pack(side=tk.RIGHT)
 
         portLabel = tk.Label(portFrame, text="Port: ")
         portLabel.pack(side=tk.LEFT)
         self.portEntry = tk.Entry(portFrame)
+        self.portEntry.insert(0, "5432")
         self.portEntry.pack(side=tk.RIGHT)
 
         userLabel = tk.Label(userFrame, text="Username: ")
         userLabel.pack(side=tk.LEFT)
         self.userEntry = tk.Entry(userFrame)
+        self.userEntry.insert(0, "postgres")
         self.userEntry.pack(side=tk.RIGHT)
 
         pwdLabel = tk.Label(pwdFrame, text="Password: ")
@@ -153,6 +133,7 @@ class projectWindow(tk.Tk):
     def createTextRectangle(self, text: str, canvas: tk.Canvas, x0: int, y0: int):
         rectangle = canvas.create_rectangle(x0, y0, x0+100, y0+50, fill = "#FFFFFF")
         textline = canvas.create_text(x0+50, y0+25, text=text, justify = 'center')
+        self.textBoxes.append(textline)
         self.planCanvas.tag_bind(rectangle, '<ButtonPress-1>', self.onObjectClick)
         self.planCanvas.tag_bind(textline, '<ButtonPress-1>', self.onObjectClick)
         return (rectangle, textline)
@@ -168,6 +149,8 @@ class projectWindow(tk.Tk):
     def drawCanvasPlan(self, root: PlanNode):
         self.planCanvas.delete("all")
         self.dictExtraToID = {}
+        self.scale = 0
+        self.textBoxes = []
 
         rootD = createDisplayNode(root)
 
@@ -179,7 +162,7 @@ class projectWindow(tk.Tk):
                 drawQueue.append((child, curNode))
             x = (curNode.left_bound*200 + curNode.right_bound*200)/2 - 50
             y = curNode.depth * 100 + 50 - 25
-            (rect, line) = self.createTextRectangle(curNode.text + ":" + str(curNode.left_bound) +":" + str(curNode.right_bound), self.planCanvas, x, y)
+            (rect, line) = self.createTextRectangle(curNode.text, self.planCanvas, x, y)
             self.dictExtraToID[rect]=curNode.annotations
             self.dictExtraToID[line]=curNode.annotations
             if(curTup[1] != None):
@@ -210,16 +193,38 @@ class projectWindow(tk.Tk):
         print("PWD:", self.pwdEntry.get())
         print("DB NAME:", self.dbNameEntry.get())
 
-    
+    def centreCanvas(self):
+        self.planCanvas.scale("all",0,0,pow(0.8, self.scale),pow(0.8, self.scale))
+        self.planCanvas.xview_moveto(0.5)
+        self.planCanvas.yview_moveto(0)
+        writingFont = font.nametofont("TkDefaultFont").copy()
+        for text in self.textBoxes:
+            self.planCanvas.itemconfig(text, font = writingFont)
+
+        self.scale = 0
+
+    def zoomIn(self):
+        self.scale +=1
+        self.planCanvas.scale("all",0,0,1.25,1.25)
+        writingFont = font.nametofont("TkDefaultFont").copy()
+        writingFont.config(size = floor(writingFont.cget("size") * pow(1.1, self.scale)))
+        for text in self.textBoxes:
+            self.planCanvas.itemconfig(text, font = writingFont)
+
+    def zoomOut(self):
+        self.scale -=1
+        self.planCanvas.scale("all",0,0,0.8,0.8)
+        writingFont = font.nametofont("TkDefaultFont").copy()
+        writingFont.config(size = floor(writingFont.cget("size") * pow(1.1, self.scale)))
+        for text in self.textBoxes:
+            self.planCanvas.itemconfig(text, font = writingFont)
+
     def __init__(self):
         super().__init__()
+        self.scale = 0
         self.dictExtraToID = {}
+        self.textBoxes = []
         self.title("CZ4031 Database Project 2")
-        #window.geometry("843x891")
-        #window.configure(bg = "#FFFFFF")
-
-        #mainFrame = tk.Frame(window)
-        #mainFrame.pack()
 
         inputFrame = tk.Frame(self)
         inputFrame.pack(side=tk.LEFT)
@@ -227,42 +232,22 @@ class projectWindow(tk.Tk):
         planFrame = tk.Frame(self)
         planFrame.pack(side=tk.RIGHT)
 
-        planLabel = tk.Label(planFrame, text="Query:")
-        planLabel.pack(anchor=tk.W)
+        planInfoFrame = tk.Frame(planFrame)
+        planInfoFrame.pack()
+        planLabel = tk.Label(planInfoFrame, text="Query:")
+        planLabel.pack(side=tk.LEFT)
+        centreBtn = tk.Button(planInfoFrame, text="RESET VIEW", command=self.centreCanvas)
+        centreBtn.pack(side=tk.RIGHT)
+        zoomFrame = tk.Frame(planFrame)
+        zoomFrame.pack()
+
+        zoomInBtn = tk.Button(zoomFrame, text = "Zoom In", command=self.zoomIn)
+        zoomInBtn.pack(side=tk.LEFT)
+        zoomOutBtn = tk.Button(zoomFrame, text = "Zoom Out", command=self.zoomOut)
+        zoomOutBtn.pack(side=tk.RIGHT)
+
         self.planCanvas = tk.Canvas(planFrame, height=600, width=600, bg="#FFFFFF")
         self.planCanvas.pack()
-
-
-        # rootS = SimpleNode()
-
-        # rootS.value="TEST"
-        # rootS.annotations="LOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOLLOL"
-
-        # node1 = SimpleNode()
-        # node1.value = "1"
-
-        # node2 = SimpleNode()
-        # node2.value = "2"
-        # rootS.children.append(node1)
-        # rootS.children.append(node2)
-
-        # node3 = SimpleNode()
-        # node3.value = "3"
-
-        # node4 = SimpleNode()
-        # node4.value = "4"
-
-        # node1.children.append(node3)
-        # node1.children.append(node4)
-
-        # node5 = SimpleNode()
-        # node5.value = "5"
-
-        # node6 = SimpleNode()
-        # node6.value = "6"
-
-        # node4.children.append(node5)
-        # node4.children.append(node6)
 
         self.planCanvas.bind("<ButtonPress-1>", self.scroll_start)
         self.planCanvas.bind("<B1-Motion>", self.scroll_move)

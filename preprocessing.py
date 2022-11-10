@@ -253,7 +253,6 @@ class SetUp():
         #Original plan
         plan = self.executeQuery(query)
         root = self.build_tree(plan)
-        print("original join: ",root.check_for_join())
         cost = self.computeTotalCost(root)
         self.query_plans["chosen_plan"]= ("Optimal Plan", root, cost)
 
