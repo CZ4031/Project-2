@@ -1,1 +1,0 @@
-self.ipEntry.get(), self.portEntry.get(), self.dbNameEntry.get(), self.userEntry.get(), self.pwdEntry.get()
