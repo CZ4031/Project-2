@@ -107,7 +107,7 @@ class SetUp():
             self.verify = False
 
     def executeQuery(self, query, off=[]):
-        optimalQEP = "EXPLAIN (VERBOSE, COSTS, FORMAT JSON)" + query
+        optimalQEP = "EXPLAIN (VERBOSE, COSTS, FORMAT JSON)" + query.strip()
 
         try:
             # set cursor variable
@@ -173,6 +173,9 @@ class SetUp():
         """
         Build the query plan tree
         """
+        if (plan == "error"):
+            print("Please check your sql statements")
+            return
         root = PlanNode()
         self.add_attributes(plan, root)
         self.add_node(plan,root)
@@ -213,7 +216,7 @@ class SetUp():
         return totalCost
 
     def addToAlternatePlans(self, plan, plan_type):
-        if(plan == "eror"):
+        if(plan == "error"):
             print(plan_type + " not added")
             return
         alternate_root = self.build_tree(plan)
@@ -252,6 +255,9 @@ class SetUp():
 
         #Original plan
         plan = self.executeQuery(query)
+        if(plan == "error"):
+            print("Please check your sql statements")
+            return
         root = self.build_tree(plan)
         cost = self.computeTotalCost(root)
         self.query_plans["chosen_plan"]= ("Optimal Plan", root, cost)

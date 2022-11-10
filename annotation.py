@@ -24,20 +24,34 @@ class Annotation:
 		annotation = ""
 
 		# For scans
-		if nodeType == "Bitmap Index Scan":
-			annotation = "Bitmap index scan is used as multiple indices are constructed for this table.\n"
-			node.annotations += annotation
+		if nodeType == "Seq Scan":
+			table = node.attributes['Relation Name']
+			node.annotations += "Sequential scan is used to read the {} table".format(table)
+			if "Filter" in node.attributes:
+				node.annotations += ", with filter {}".format(node.attributes['Filter'])
+			node.annotations += ".\n"
 			self.comparison(node)
 
-		if nodeType == "Bitmap Heap Scan":
-			annotation = "Bitmap heap scan is used as multiple indices as constructed. A heap is used to " \
-							"sort the indices and quickly cut down the number of tuples scanned.\n "
-			node.annotations += annotation
+		if nodeType == "Index Scan":
+			table = node.attributes['Relation Name']
+			node.annotations += "Index scan is used to read the {} table".format(table)
+			if "Index Cond" in node.attributes:
+				# cond = plans[i]['Index Cond']
+				# split = cond.split(":", 1)
+				node.annotations += " with conditions {}".format(node.attributes['Index Cond'])
+			if "Filter" in node.attributes:
+				node.annotations += ". The result is then filtered using {}".format(node.attributes['Filter'])
+			node.annotations += ".\n"
 			self.comparison(node)
 
-		if nodeType == "Sequential Scan":
-			annotation = "Sequential scan is used to read the table as there is no index.\n"
-			node.annotations += annotation
+		if nodeType == "Index Only Scan":
+			table = node.attributes['Relation Name']
+			node.annotations += "Index only scan is used to read the {} table".format(table)
+			if "Index Cond" in node.attributes:
+				node.annotations += " with conditions {}".format(node.attributes['Index Cond'])
+			if "Filter" in node.attributes:
+				node.annotations += ". The result is then filtered using {}".format(node.attributes['Filter'])
+			node.annotations += ".\n"
 			self.comparison(node)
 
 		# For joins
@@ -105,3 +119,14 @@ class Annotation:
 		if nodeType == "Project":
 			annotation = "Unnecessary elements are removed and the remaining elements are projected.\n"
 			node.annotations += annotation
+
+		# if nodeType == "Bitmap Index Scan":
+		# 	annotation = "Bitmap index scan is used as multiple indices are constructed for this table.\n"
+		# 	node.annotations += annotation
+		# 	self.comparison(node)
+
+		# if nodeType == "Bitmap Heap Scan":
+		# 	annotation = "Bitmap heap scan is used as multiple indices as constructed. A heap is used to " \
+		# 					"sort the indices and quickly cut down the number of tuples scanned.\n "
+		# 	node.annotations += annotation
+		# 	self.comparison(node)
