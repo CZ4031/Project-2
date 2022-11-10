@@ -21,6 +21,7 @@ class Annotation:
 
 	def generateAnnotation(self, node):
 		nodeType = node.attributes['Node Type']
+		annotation = ""
 
 		# For scans
 		if nodeType == "Bitmap Index Scan":
@@ -63,20 +64,20 @@ class Annotation:
 		if nodeType == "Aggregate":
 			strategy = node.attributes['Strategy']
 			if strategy == "Sorted":
-				annotation = "The Aggregate operation will sort the tuples based on the keys [{}].\n".format(node.attributes["Group Key"])
+				annotation = f"The Aggregate operation will sort the tuples based on the keys {node.attributes['Group Key']}.\n"
 				# if "Filter" in plans[i]:
 				# 	annotated += 'The result is then filtered by [{}]. '.format(plans[i]['Filter'])
 			if strategy == "Plain":
 				annotation = "The Aggregate operation will be performed.\n"
 			if strategy == "Hashed":
-				annotation = "The Aggregate operation will hash the rows based on keys [{}]. The selected rows are then returned.\n".format(node["Group Key"])
+				annotation = f"The Aggregate operation will hash the rows based on keys {node.attributes['Group Key']}. The selected rows are then returned.\n "
 			node.annotations += annotation
 
 		if nodeType == "Sort":
-			annotation = "Sort the table based on the key {}.\n".format(node.attributes['Sort Key'])
-			if "INC" in node.attributes["Sort Key"]:
+			annotation = f"Sort the table based on the key {node.attributes['Sort Key']}.\n"
+			if "INC" in node.attributes['Sort Key']:
 				annotation += 'in an incremental manner.\n'
-			if "DESC" in node.attributes["Sort Key"]:
+			if "DESC" in node.attributes['Sort Key']:
 				annotation += 'in a decremental manner.\n'
 			node.annotations += annotation
 
