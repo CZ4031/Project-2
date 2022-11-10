@@ -18,8 +18,6 @@ class PlanNode():
         self.attributes = {}
         self.annotations = ""
         self.alternate_plans = {} # Key: alternative plan used, Value: ratio, how much more costly (alternate plan cost / optimal cost)
-        #self.alternate_scans = ""
-        #self.alternate_scan_dict = {}
     
     def print_tree(self):
         queue = []
@@ -34,19 +32,19 @@ class PlanNode():
                 for child in node.children:
                     queue.append(child)
 
-    def check_for_join(self):
-        queue = []
-        queue.append(self)
-        joins_used = {}
-        while len(queue)!=0:
-            childlength = len(queue)
-            for i in range(childlength):
-                node = queue.pop(0)
-                if "Join" in node.attributes['Node Type'] or "Loop" in node.attributes['Node Type']:
-                    joins_used[node.attributes['Node Type']] = int(node.attributes['Total Cost'])
-                for child in node.children:
-                    queue.append(child)
-        return joins_used
+    # def check_for_join(self):
+    #     queue = []
+    #     queue.append(self)
+    #     joins_used = {}
+    #     while len(queue)!=0:
+    #         childlength = len(queue)
+    #         for i in range(childlength):
+    #             node = queue.pop(0)
+    #             if "Join" in node.attributes['Node Type'] or "Loop" in node.attributes['Node Type']:
+    #                 joins_used[node.attributes['Node Type']] = int(node.attributes['Total Cost'])
+    #             for child in node.children:
+    #                 queue.append(child)
+    #     return joins_used
 
 
 class SetUp():
@@ -103,7 +101,7 @@ class SetUp():
             #self.connection = psycopg2.connect(host = config("HOST"), port = config("PORT") ,database= config("DATABASE"), user= config("USER"), password= config("PASSWORD"))
             self.verify = True
             if(self.verify):
-                print("Connected")
+                #print("Connected")
                 self.cursor = self.connection.cursor()
         except (Exception, psycopg2.DatabaseError):
             self.verify = False
@@ -115,7 +113,6 @@ class SetUp():
             # set cursor variable
             cursor = self.cursor
             #Setting off for alternate query plans
-            cursor.execute("set statement_timeout = 5000")
             # Default turn off variables not used
             cursor.execute(self.off_config["Tid Scan"])
             cursor.execute(self.off_config["Index Only Scan"])
@@ -135,6 +132,7 @@ class SetUp():
             # write explain details into json file
             # with open('chosenQueryPlan.json', 'w') as output_file:
             #     chosenQueryPlan = (json.dump(explain_query, output_file, ensure_ascii = False, indent = 4))
+            self.queryError = False
 
             return explain_query[0][0][0]['Plan']
         except(Exception, psycopg2.DatabaseError) as error:
@@ -142,8 +140,9 @@ class SetUp():
                 # Check how to seperate errors
                 print("Your error is: ", error)
                 # print("Your query is: ", query)
-                #explain_query = "Please check your sql statement: \n" + query
-                self.connection.rollback()
+                message = "Please check your sql statement: \n" + query
+                print(message)
+                self.queryError = True
                 return "error"
        
 
