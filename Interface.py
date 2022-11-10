@@ -169,10 +169,13 @@ class projectWindow(tk.Tk):
                 self.planCanvas.create_line((curNode.left_bound*200 + curNode.right_bound*200)/2, curNode.depth * 100 + 50 - 25, (curTup[1].left_bound*200 + curTup[1].right_bound*200)/2, (curNode.depth-1) * 100 + 50 + 25)
 
     def processQuery(self):
-        with open('query3.txt', 'r') as file:
-            data = file.read().replace('\n', ' ')
-        query = data
-        self.connect.getAllQueryPlans(query)
+        # with open('query3.txt', 'r') as file:
+        #     data = file.read().replace('\n', ' ')
+        # query = data
+        self.connect.getAllQueryPlans(self.queryTextBox.get(1.0, "end-1c"))
+        if(self.connect.queryError):
+            print("Please check your sql statements")
+            return
         print(self.connect.query_plans['chosen_plan'][1].print_tree())
 
         annotation = Annotation()

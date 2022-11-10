@@ -69,7 +69,7 @@ class Annotation:
 			if strategy == "Plain":
 				annotation = "The Aggregate operation will be performed.\n"
 			if strategy == "Hashed":
-				annotation = "The Aggregate operation will hash the rows based on keys [{}]. The selected rows are then returned.\n".format(node["Group Key"])
+				annotation = "The Aggregate operation will hash the rows based on keys [{}]. The selected rows are then returned.\n".format(node.attributes["Group Key"])
 			node.annotations += annotation
 
 		if nodeType == "Sort":
