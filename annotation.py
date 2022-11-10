@@ -1,13 +1,14 @@
 class Annotation:
-	def traverseTree(self, root):
+	tableList = []
+	# changed to bottom up
+	def traverseTree(self, root, tableList):
 		if not root:
 			return
-		
-		self.generateAnnotation(root)
-
 		if root.children:
 			for child in root.children:
-				self.traverseTree(child)
+				self.traverseTree(child, tableList)
+		temp = self.generateAnnotation(root)
+		tableList.append(temp)
 
 	def comparison(self, node):
 		if len(node.alternate_plans) != 0:
@@ -30,6 +31,7 @@ class Annotation:
 				node.annotations += ", with filter {}".format(node.attributes['Filter'])
 			node.annotations += ".\n"
 			self.comparison(node)
+			return table
 
 		if nodeType == "Index Scan":
 			table = node.attributes['Relation Name']
@@ -42,6 +44,8 @@ class Annotation:
 				node.annotations += ". The result is then filtered using {}".format(node.attributes['Filter'])
 			node.annotations += ".\n"
 			self.comparison(node)
+			return table
+
 
 		if nodeType == "Index Only Scan":
 			table = node.attributes['Relation Name']
@@ -52,6 +56,7 @@ class Annotation:
 				node.annotations += ". The result is then filtered using {}".format(node.attributes['Filter'])
 			node.annotations += ".\n"
 			self.comparison(node)
+			return table
 
 		# For joins
 		if nodeType == "Hash Join":
