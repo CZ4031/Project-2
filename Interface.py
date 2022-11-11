@@ -13,8 +13,11 @@ from annotation import *
 import tkinter as tk
 from tkinter import font
 from tkinter import messagebox
-#from tkinter.ttk import *
 
+
+# from tkinter.ttk import *
+
+# Functions for the appication
 
 def countLeafNodes(node: PlanNode):
 	leafNodesNum = 0
@@ -73,25 +76,25 @@ def createDisplayNode(root: PlanNode):
 
 
 class projectWindow(tk.Tk):
-    def createLoginDetails(self):
-        # Labelling frames
-        ipFrame = tk.Frame(self.sqlLabelFrame)
-        ipFrame.pack(anchor=tk.W)
-        portFrame = tk.Frame(self.sqlLabelFrame)
-        portFrame.pack(anchor=tk.W)
-        dbNameFrame = tk.Frame(self.sqlLabelFrame)
-        dbNameFrame.pack(anchor=tk.W)
-        userFrame = tk.Frame(self.sqlLabelFrame)
-        userFrame.pack(anchor=tk.W)
-        pwdFrame = tk.Frame(self.sqlLabelFrame)
-        pwdFrame.pack(anchor=tk.W)
-          
-        # Auto filling certain labels
-        ipLabel = tk.Label(ipFrame, text="IP address: ")
-        ipLabel.pack(side=tk.LEFT)
-        self.ipEntry = tk.Entry(ipFrame)
-        self.ipEntry.insert(0, "127.0.0.1")
-        self.ipEntry.pack(side=tk.RIGHT)
+	def createLoginDetails(self):
+		# Labelling frames
+		ipFrame = tk.Frame(self.sqlLabelFrame)
+		ipFrame.pack(anchor=tk.W)
+		portFrame = tk.Frame(self.sqlLabelFrame)
+		portFrame.pack(anchor=tk.W)
+		dbNameFrame = tk.Frame(self.sqlLabelFrame)
+		dbNameFrame.pack(anchor=tk.W)
+		userFrame = tk.Frame(self.sqlLabelFrame)
+		userFrame.pack(anchor=tk.W)
+		pwdFrame = tk.Frame(self.sqlLabelFrame)
+		pwdFrame.pack(anchor=tk.W)
+
+		# Auto filling certain labels
+		ipLabel = tk.Label(ipFrame, text="IP address: ")
+		ipLabel.pack(side=tk.LEFT)
+		self.ipEntry = tk.Entry(ipFrame)
+		self.ipEntry.insert(0, "127.0.0.1")
+		self.ipEntry.pack(side=tk.RIGHT)
 
 		portLabel = tk.Label(portFrame, text="Port: ")
 		portLabel.pack(side=tk.LEFT)
@@ -108,13 +111,11 @@ class projectWindow(tk.Tk):
 		pwdLabel = tk.Label(pwdFrame, text="Password: ")
 		pwdLabel.pack(side=tk.LEFT)
 		self.pwdEntry = tk.Entry(pwdFrame)
-		self.pwdEntry.insert(0, "password")  # TODO: comment it out
 		self.pwdEntry.pack(side=tk.RIGHT)
 
 		dbNameLabel = tk.Label(dbNameFrame, text="Database name: ")
 		dbNameLabel.pack(side=tk.LEFT)
 		self.dbNameEntry = tk.Entry(dbNameFrame)
-		self.dbNameEntry.insert(0, "TPC-H")  # TODO: comment it out
 		self.dbNameEntry.pack(side=tk.RIGHT)
 
 		loginBtn = tk.Button(self.sqlLabelFrame, text="LOGIN", command=self.processLogin)
@@ -132,9 +133,10 @@ class projectWindow(tk.Tk):
 		self.annoStr.set(self.dictExtraToID[event.widget.find_closest(x, y)[0]])
 		if (self.dictExtraToID[event.widget.find_closest(x, y)[0]] != ""):
 			self.open_popup(self.dictExtraToID[event.widget.find_closest(x, y)[0]])
-		# self.annoStr.set(self.dictExtraToID[event.widget.find_closest(event.x, event.y)[0]])
-		# if(self.dictExtraToID[event.widget.find_closest(event.x, event.y)[0]] != ""):
-		#     self.open_popup(self.dictExtraToID[event.widget.find_closest(event.x, event.y)[0]])
+
+	# self.annoStr.set(self.dictExtraToID[event.widget.find_closest(event.x, event.y)[0]])
+	# if(self.dictExtraToID[event.widget.find_closest(event.x, event.y)[0]] != ""):
+	#     self.open_popup(self.dictExtraToID[event.widget.find_closest(event.x, event.y)[0]])
 
 	def createTextRectangle(self, text: str, canvas: tk.Canvas, x0: int, y0: int):
 		rectangle = canvas.create_rectangle(x0, y0, x0 + 100, y0 + 50, fill="#FFFFFF")
@@ -177,77 +179,21 @@ class projectWindow(tk.Tk):
 											(curTup[1].left_bound * 200 + curTup[1].right_bound * 200) / 2,
 											(curNode.depth - 1) * 100 + 50 + 25)
 
-    def processQuery(self):
-        # with open('query3.txt', 'r') as file:
-        #     data = file.read().replace('\n', ' ')
-        # query = data
-        
-        # Check if user logged in correctly
-        
-        if not self.connect.verify:
-            messagebox.showerror(
-                title="Warning", message="User is not Logged In. Try Again")
-            return
-
-        # User logged in correctly
-        print("query entered: ", self.queryTextBox.get(1.0, "end-1c"))
-        self.connect.getAllQueryPlans(self.queryTextBox.get(1.0, "end-1c"))
-
-        # SQL Statement is wrong
-        if(self.connect.queryError):
-            print("Please check your sql statements")
-            messagebox.showerror(
-                title="Warning", message="Please check your sql statement entered.")
-            return
-
-         # Clear query
-        self.queryTextBox.delete(1.0, "end")
-
-        print(self.connect.query_plans['chosen_plan'][1].print_tree())
+	def processQuery(self):
+		# with open('query3.txt', 'r') as file:
+		#     data = file.read().replace('\n', ' ')
+		# query = data
 
 		# Check if user logged in correctly
 
-        # Draw optimal query tree
-        self.drawCanvasPlan(self.connect.query_plans['chosen_plan'][1])
+		if not self.connect.verify:
+			messagebox.showerror(
+				title="Warning", message="User is not Logged In. Try Again")
+			return
 
-
-    def processLogin(self):
-        # Checking if entry labels are empty in case user did not enter
-        typesOfEntry = []
-        typesOfEntry.extend([self.ipEntry, self.portEntry,
-                            self.userEntry, self.pwdEntry, self.dbNameEntry])
-        isEmpty = False
-        for i in typesOfEntry:
-            if len(i.get()) == 0:
-                isEmpty = True
-        if isEmpty:
-            messagebox.showerror(
-                title="Warning", message="Please fill All Empty Fields")
-            return
-
-        # Establishing connection
-        self.connect = SetUp(self.ipEntry.get(), self.portEntry.get(), self.dbNameEntry.get(), self.userEntry.get(), self.pwdEntry.get())
-
-        # Checking if login credentials are correct
-       
-        if not self.connect.verify:
-            messagebox.showerror(
-                title="Warning", message="User is not Logged In. Try Again")
-            return
-
-        messagebox.showinfo(
-            title="Success", message="Use is logged in!!")
-        
-
-        #query = "SELECT * FROM customer"
-       
-        # print("-------------------Best plan operator tree--------------")
-        # print(self.connect.query_plans['chosen_plan'][1].print_tree())
-        print("IP:", self.ipEntry.get())
-        print("PORT:", self.portEntry.get())
-        print("USER:", self.userEntry.get())
-        print("PWD:", self.pwdEntry.get())
-        print("DB NAME:", self.dbNameEntry.get())
+		# User logged in correctly
+		print("query entered: ", self.queryTextBox.get(1.0, "end-1c"))
+		self.connect.getAllQueryPlans(self.queryTextBox.get(1.0, "end-1c"))
 
 		# SQL Statement is wrong
 		if (self.connect.queryError):
