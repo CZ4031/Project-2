@@ -23,8 +23,6 @@ class Annotation:
 		group_key = []
 		if "Group Key" in node.attributes:
 			group_key = node.attributes['Group Key']
-		# elif "Sort Key" in node.attributes:
-		# 	group_key = node.attributes['Sort Key']
 
 		list_of_keys = []
 		for key in group_key:
@@ -34,7 +32,6 @@ class Annotation:
 			stringOfKeys = ', '.join(list_of_keys)
 		else:
 			stringOfKeys = list_of_keys[0]
-		print("---------------------", stringOfKeys)
 		return stringOfKeys
 
 	def getTables(self, cond):
@@ -72,11 +69,7 @@ class Annotation:
 				"and it would be faster compared to Sequential Scan".format(table)
 			if "Index Cond" in node.attributes:
 				cond = node.attributes['Index Cond']
-				cond = cond.replace(" ", "")
-				cond = cond.replace(")AND(", ", ")
-				cond = cond.replace(")OR(", ", ")
-				cond = cond.replace("(", "")
-				cond = cond.replace(")", "")
+				cond = self.formatCondition(cond)
 				node.annotations += " with conditions {}".format(cond)
 			node.annotations += ".\n"
 			self.comparison(node)
@@ -221,16 +214,7 @@ class Annotation:
 
 		if nodeType == "GroupAggregate":
 			if "Group Key" in node.attributes:
-				group_key = node.attributes['Group Key']
-				list_of_keys = []
-				for key in group_key:
-					list_of_keys.append(key)
-				stringOfKeys = ', '.join(list_of_keys)
-				if len(list_of_keys) > 1:
-					stringOfKeys = ', '.join(list_of_keys)
-				else:
-					stringOfKeys = list_of_keys[0]
-				#print("---------------------", stringOfKeys)
+				stringOfKeys = getKeys(node)
 				annotation = "The Group Aggregate operation will perform grouping on keys: {}.\n".format(stringOfKeys)
 			else:
 				annotation = "The Group Aggregate operation will be performed.\n"
@@ -239,16 +223,7 @@ class Annotation:
 
 		if nodeType == "HashAggregate":
 			if "Group Key" in node.attributes:
-				group_key = node.attributes['Group Key']
-				list_of_keys = []
-				for key in group_key:
-					list_of_keys.append(key)
-				stringOfKeys = ', '.join(list_of_keys)
-				if len(list_of_keys) > 1:
-					stringOfKeys = ', '.join(list_of_keys)
-				else:
-					stringOfKeys = list_of_keys[0]
-				#print("---------------------", stringOfKeys)
+				stringOfKeys = getKeys(node)
 				annotation = "The Hash Aggregate operation will perform grouping on keys: {}.\n".format(stringOfKeys)
 			else:
 				annotation = "The Hash Aggregate operation will be performed.\n"
