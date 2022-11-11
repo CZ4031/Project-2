@@ -61,9 +61,13 @@ class Annotation:
 			table = node.attributes['Relation Name']
 			node.annotations += "Index scan is used to read the {} table".format(table)
 			if "Index Cond" in node.attributes:
-				# cond = plans[i]['Index Cond']
-				# split = cond.split(":", 1)
-				node.annotations += " with conditions {}".format(node.attributes['Index Cond'])
+				cond = node.attributes['Index Cond']
+				cond = cond.replace(" ", "")
+				cond = cond.replace(")AND(", ", ")
+				cond = cond.replace(")OR(", ", ")
+				cond = cond.replace("(", "")
+				cond = cond.replace(")", "")
+				node.annotations += " with conditions {}".format(cond)
 			node.annotations += ".\n"
 			self.comparison(node)
 
@@ -71,7 +75,13 @@ class Annotation:
 			table = node.attributes['Relation Name']
 			node.annotations += "Index only scan is used to read the {} table".format(table)
 			if "Index Cond" in node.attributes:
-				node.annotations += " with conditions {}".format(node.attributes['Index Cond'])
+				cond = node.attributes['Index Cond']
+				cond = cond.replace(" ", "")
+				cond = cond.replace(")AND(", ", ")
+				cond = cond.replace(")OR(", ", ")
+				cond = cond.replace("(", "")
+				cond = cond.replace(")", "")
+				node.annotations += " with conditions {}".format(cond)
 			node.annotations += ".\n"
 			self.comparison(node)
 
@@ -198,12 +208,10 @@ class Annotation:
 		if nodeType == "CTE Scan":
 			annotation = "CTE Scan is performed on table {}.\n".format(node.attributes['CTE Name'])
 			node.annotations += annotation
-			self.comparison(node)
 
 		if nodeType == "Foreign Scan":
 			annotation = "Foreign Scan is performed on table {}.\n".format(node.attributes['Relation Name'])
 			node.annotations += annotation
-			self.comparison(node)
 
 		if nodeType == "Limit":
 			numRows = node.attributes['Plan Rows']
