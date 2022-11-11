@@ -210,16 +210,22 @@ class projectWindow(tk.Tk):
 		annotation = Annotation()
 		annotation.traverseTree(self.connect.query_plans['chosen_plan'][1])
 
-        # Checking if login credentials are correct
-       
-        if not self.connect.verify:
-            messagebox.showerror(
-                title="Warning", message="User is not Logged In. Credentials are wrong. Try Again")
-            return
+		# Draw optimal query tree
+		self.drawCanvasPlan(self.connect.query_plans['chosen_plan'][1])
 
-        messagebox.showinfo(
-            title="Success", message="User is logged in!!")
-        
+	def processLogin(self):
+		# Checking if entry labels are empty in case user did not enter
+		typesOfEntry = []
+		typesOfEntry.extend([self.ipEntry, self.portEntry,
+							 self.userEntry, self.pwdEntry, self.dbNameEntry])
+		isEmpty = False
+		for i in typesOfEntry:
+			if len(i.get()) == 0:
+				isEmpty = True
+		if isEmpty:
+			messagebox.showerror(
+				title="Warning", message="Please fill All Empty Fields")
+			return
 
 		# Establishing connection
 		self.connect = SetUp(self.ipEntry.get(), self.portEntry.get(), self.dbNameEntry.get(), self.userEntry.get(),
@@ -229,11 +235,11 @@ class projectWindow(tk.Tk):
 
 		if not self.connect.verify:
 			messagebox.showerror(
-				title="Warning", message="User is not Logged In. Try Again")
+				title="Warning", message="User is not Logged In. Credentials are wrong. Try Again")
 			return
 
 		messagebox.showinfo(
-			title="Success", message="Use is logged in!!")
+			title="Success", message="User is logged in!!")
 
 		# query = "SELECT * FROM customer"
 
