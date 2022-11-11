@@ -144,7 +144,11 @@ class Annotation:
 				else:
 					annotation = "The Hash Aggregate operation will be performed.\n"
 			else:
-				annotation = "The Aggregate operation will be performed.\n"
+				if "Group Key" in node.attributes:
+					stringOfKeys = self.getKeys(node)
+					annotation = "The Aggregate operation will perform grouping on {}.\n".format(stringOfKeys)
+				else:
+					annotation = "The Aggregate operation will be performed.\n"
 			node.annotations += annotation
 
 		if nodeType == "Sort":
