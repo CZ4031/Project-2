@@ -214,7 +214,7 @@ class Annotation:
 
 		if nodeType == "GroupAggregate":
 			if "Group Key" in node.attributes:
-				stringOfKeys = getKeys(node)
+				stringOfKeys = self.getKeys(node)
 				annotation = "The Group Aggregate operation will perform grouping on keys: {}.\n".format(stringOfKeys)
 			else:
 				annotation = "The Group Aggregate operation will be performed.\n"
@@ -223,7 +223,7 @@ class Annotation:
 
 		if nodeType == "HashAggregate":
 			if "Group Key" in node.attributes:
-				stringOfKeys = getKeys(node)
+				stringOfKeys = self.getKeys(node)
 				annotation = "The Hash Aggregate operation will perform grouping on keys: {}.\n".format(stringOfKeys)
 			else:
 				annotation = "The Hash Aggregate operation will be performed.\n"
