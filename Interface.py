@@ -226,11 +226,11 @@ class projectWindow(tk.Tk):
        
         if not self.connect.verify:
             messagebox.showerror(
-                title="Warning", message="User is not Logged In. Try Again")
+                title="Warning", message="User is not Logged In. Credentials are wrong. Try Again")
             return
 
         messagebox.showinfo(
-            title="Success", message="Use is logged in!!")
+            title="Success", message="User is logged in!!")
         
 
         #query = "SELECT * FROM customer"

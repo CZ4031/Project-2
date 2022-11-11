@@ -108,7 +108,7 @@ class Annotation:
 					for key in group_key:
 						list_of_keys.append(key)
 					stringOfKeys = ', '.join(list_of_keys)
-					if len(stringOfKeys) > 1:
+					if len(list_of_keys) > 1:
 						stringOfKeys = ', '.join(list_of_keys)
 					else:
 						stringOfKeys = list_of_keys[0]
@@ -122,7 +122,7 @@ class Annotation:
 					list_of_keys = []
 					for key in group_key:
 						list_of_keys.append(key)
-					if len(stringOfKeys) > 1:
+					if len(list_of_keys) > 1:
 						stringOfKeys = ', '.join(list_of_keys)
 					else:
 						stringOfKeys = list_of_keys[0]
