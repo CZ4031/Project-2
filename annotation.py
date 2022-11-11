@@ -46,6 +46,14 @@ class Annotation:
 		table2 = condsplit2[1]
 		return table1, table2
 
+	def formatCondition(self, cond):
+		cond = cond.replace(" ", "")
+		cond = cond.replace(")AND(", ", ")
+		cond = cond.replace(")OR(", ", ")
+		cond = cond.replace("(", "")
+		cond = cond.replace(")", "")
+		return cond
+
 	def generateAnnotation(self, node):
 		nodeType = node.attributes['Node Type']
 		annotation = ""
@@ -75,12 +83,7 @@ class Annotation:
 			table = node.attributes['Relation Name']
 			node.annotations += "Index only scan is used to read the {} table".format(table)
 			if "Index Cond" in node.attributes:
-				cond = node.attributes['Index Cond']
-				cond = cond.replace(" ", "")
-				cond = cond.replace(")AND(", ", ")
-				cond = cond.replace(")OR(", ", ")
-				cond = cond.replace("(", "")
-				cond = cond.replace(")", "")
+				cond = self.formatCondition(cond)
 				node.annotations += " with conditions {}".format(cond)
 			node.annotations += ".\n"
 			self.comparison(node)
@@ -89,11 +92,7 @@ class Annotation:
 		if nodeType == "Hash Join":
 			cond = node.attributes['Hash Cond']
 			try:
-				cond = cond.replace(" ", "")
-				cond = cond.replace(")AND(", ", ")
-				cond = cond.replace(")OR(", ", ")
-				cond = cond.replace("(", "")
-				cond = cond.replace(")", "")
+				cond = self.formatCondition(cond)
 
 				condsplit = cond.split('.')
 				table1 = condsplit[0]
@@ -108,11 +107,7 @@ class Annotation:
 		if nodeType == "Merge Join":
 			cond = node.attributes['Merge Cond']
 			try:
-				cond = cond.replace(" ", "")
-				cond = cond.replace(")AND(", ", ")
-				cond = cond.replace(")OR(", ", ")
-				cond = cond.replace("(", "")
-				cond = cond.replace(")", "")
+				cond = self.formatCondition(cond)
 
 				condsplit = cond.split('.')
 				table1 = condsplit[0]
