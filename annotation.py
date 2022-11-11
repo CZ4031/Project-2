@@ -12,12 +12,39 @@ class Annotation:
 	def comparison(self, node):
 		if len(node.alternate_plans) != 0:
 			for altScan in node.alternate_plans:
-				annotation = f"Compared to {node.attributes['Node Type']}, {altScan} is {node.alternate_plans.get(altScan):.2f} " \
+				annotation = f"\nCompared to {node.attributes['Node Type']}, {altScan} is {node.alternate_plans.get(altScan):.2f} " \
 								f"times as expensive.\n"
 				node.annotations += annotation
 		else:
-			annotation = f"{node.attributes['Node Type']} is used across all AQPs."
+			annotation = f"{node.attributes['Node Type']} is used across all AQPs.\n"
 			node.annotations += annotation
+
+	def getKeys(self, node):
+		group_key = []
+		if "Group Key" in node.attributes:
+			group_key = node.attributes['Group Key']
+		# elif "Sort Key" in node.attributes:
+		# 	group_key = node.attributes['Sort Key']
+
+		list_of_keys = []
+		for key in group_key:
+			list_of_keys.append(key)
+		stringOfKeys = ', '.join(list_of_keys)
+		if len(stringOfKeys) > 1:
+			stringOfKeys = ', '.join(list_of_keys)
+		else:
+			stringOfKeys = list_of_keys[0]
+		print("---------------------", stringOfKeys)
+		return stringOfKeys
+
+	def getTables(self, cond):
+		cond = cond.replace(" ", "")
+		cond = cond.lstrip("(").rstrip(")")
+		condsplit = cond.split('.')
+		table1 = condsplit[0]
+		condsplit2 = condsplit[1].split('=')
+		table2 = condsplit2[1]
+		return table1, table2
 
 	def generateAnnotation(self, node):
 		nodeType = node.attributes['Node Type']
@@ -27,8 +54,8 @@ class Annotation:
 		if nodeType == "Seq Scan":
 			table = node.attributes['Relation Name']
 			node.annotations += "Sequential scan is used to read the {} table".format(table)
-			if "Filter" in node.attributes:
-				node.annotations += ", with filter {}".format(node.attributes['Filter'])
+			# if "Filter" in node.attributes:
+			# 	node.annotations += ", with filter {}".format(node.attributes['Filter'])
 			node.annotations += ".\n"
 			self.comparison(node)
 
@@ -56,12 +83,22 @@ class Annotation:
 
 		# For joins
 		if nodeType == "Hash Join":
-			annotation = "Hash join is done on tables XX and YY on the conditions AA, to get resulting table BB.\n"
+			cond = node.attributes['Hash Cond']
+			try:
+				table1, table2 = self.getTables(cond)
+				annotation = "Hash join is performed on tables {} and {}, with the conditions {}.\n".format(table1, table2, cond)
+			except:
+				annotation = "Hash join is performed with the conditions {}.\n".format(cond)
 			node.annotations += annotation
 			self.comparison(node)
 
 		if nodeType == "Merge Join":
-			annotation = "Merge join is done on tables XX and YY on the conditions AA, to get resulting table BB.\n"
+			cond = node.attributes['Merge Cond']
+			try:
+				table1, table2 = self.getTables(cond)
+				annotation = "Merge join is performed on tables {} and {}, with the conditions {}.\n".format(table1, table2, cond)
+			except:
+				annotation = "Merge join is performed with the conditions {}.\n".format(cond)
 			node.annotations += annotation
 			self.comparison(node)
 
@@ -78,21 +115,42 @@ class Annotation:
 		if nodeType == "Aggregate":
 			strategy = node.attributes['Strategy']
 			if strategy == "Sorted":
-				annotation = f"The Aggregate operation will sort the tuples based on the keys {node.attributes['Group Key']}.\n"
-				# if "Filter" in plans[i]:
-				# 	annotated += 'The result is then filtered by [{}]. '.format(plans[i]['Filter'])
-			if strategy == "Plain":
+				if "Group Key" in node.attributes:
+					stringOfKeys = self.getKeys(node)
+					annotation = "The Sort Aggregate operation will perform grouping on keys: {}.\n".format(stringOfKeys)
+				else:
+					annotation = "The Sort Aggregate operation will be performed.\n"
+			elif strategy == "Hashed":
+				if "Group Key" in node.attributes:
+					stringOfKeys = self.getKeys(node)
+					annotation = "The Hash Aggregate operation will perform grouping on {}.\n".format(stringOfKeys)
+				else:
+					annotation = "The Hash Aggregate operation will be performed.\n"
+			else:
 				annotation = "The Aggregate operation will be performed.\n"
 			if strategy == "Hashed":
 				annotation = f"The Aggregate operation will hash the rows based on keys {node.attributes['Group Key']}. The selected rows are then returned.\n "
 			node.annotations += annotation
 
 		if nodeType == "Sort":
-			annotation = f"Sort the table based on the key {node.attributes['Sort Key']}.\n"
-			if "INC" in node.attributes['Sort Key']:
-				annotation += 'in an incremental manner.\n'
-			if "DESC" in node.attributes['Sort Key']:
-				annotation += 'in a decremental manner.\n'
+			# sortKey = self.getKeys(node)
+			print(node.attributes['Sort Key'])
+			# print(sortKey)
+			print()
+
+			annotation = "Sort the table on keys "
+			desc = False
+			for key in node.attributes['Sort Key']:
+				if "DESC" in key:
+					desc = True
+				else:
+					annotation += f"{key}, "
+			annotation = annotation[:-2]
+			if desc:
+				annotation += ' in a decremental manner.'
+			else:
+				annotation += ' in an incremental manner.'
+			annotation += '\n\n'
 			node.annotations += annotation
 
 		if nodeType == "Unique":
@@ -125,8 +183,8 @@ class Annotation:
 		# 	node.annotations += annotation
 		# 	self.comparison(node)
 
-		# if nodeType == "Bitmap Heap Scan":
-		# 	annotation = "Bitmap heap scan is used as multiple indices as constructed. A heap is used to " \
-		# 					"sort the indices and quickly cut down the number of tuples scanned.\n "
-		# 	node.annotations += annotation
-		# 	self.comparison(node)
+		if nodeType == "Bitmap Heap Scan":
+			annotation = "Bitmap heap scan is used as multiple indices as constructed. A heap is used to " \
+							"sort the indices and quickly cut down the number of tuples scanned.\n "
+			node.annotations += annotation
+			self.comparison(node)
