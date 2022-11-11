@@ -58,14 +58,14 @@ class Annotation:
 		# For scans
 		if nodeType == "Seq Scan":
 			table = node.attributes['Relation Name']
-			node.annotations += "Sequential scan is used to read the {} table, because there is either no index available," \
+			node.annotations += "Sequential scan is used to read the {} table, because there is either no index available, " \
 				"or the result is about the same size as the tree, which would cause an Index Scan to take longer".format(table)
 			node.annotations += ".\n"
 			self.comparison(node)
 
 		if nodeType == "Index Scan":
 			table = node.attributes['Relation Name']
-			node.annotations += "Index scan is used to read the {} table, because there is an index available" \
+			node.annotations += "Index scan is used to read the {} table, because there is an index available " \
 				"and it would be faster compared to Sequential Scan".format(table)
 			if "Index Cond" in node.attributes:
 				cond = node.attributes['Index Cond']
@@ -76,7 +76,7 @@ class Annotation:
 
 		if nodeType == "Index Only Scan":
 			table = node.attributes['Relation Name']
-			node.annotations += "Index only scan is used to read the {} table".format(table)
+			node.annotations += "Index only scan is used to read the {} table ".format(table)
 			if "Index Cond" in node.attributes:
 				cond = self.formatCondition(cond)
 				node.annotations += " with conditions {}".format(cond)
@@ -148,11 +148,6 @@ class Annotation:
 			node.annotations += annotation
 
 		if nodeType == "Sort":
-			# sortKey = self.getKeys(node)
-			print(node.attributes['Sort Key'])
-			# print(sortKey)
-			print()
-
 			annotation = "Sort the table on keys "
 			desc = False
 			for key in node.attributes['Sort Key']:
