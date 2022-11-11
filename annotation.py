@@ -221,7 +221,7 @@ class Annotation:
 				for key in group_key:
 					list_of_keys.append(key)
 				stringOfKeys = ', '.join(list_of_keys)
-				if len(stringOfKeys) > 1:
+				if len(list_of_keys) > 1:
 					stringOfKeys = ', '.join(list_of_keys)
 				else:
 					stringOfKeys = list_of_keys[0]
@@ -239,7 +239,7 @@ class Annotation:
 				for key in group_key:
 					list_of_keys.append(key)
 				stringOfKeys = ', '.join(list_of_keys)
-				if len(stringOfKeys) > 1:
+				if len(list_of_keys) > 1:
 					stringOfKeys = ', '.join(list_of_keys)
 				else:
 					stringOfKeys = list_of_keys[0]
@@ -249,12 +249,3 @@ class Annotation:
 				annotation = "The Hash Aggregate operation will be performed.\n"
 			node.annotations += annotation
 			self.comparison(node)
-
-		# i dont think theres select and project...?
-		# if nodeType == "Select":
-		# 	annotation = "Tuples fulfilling the conditions are selected.\n"
-		# 	node.annotations += annotation
-
-		# if nodeType == "Project":
-		# 	annotation = "Unnecessary elements are removed and the remaining elements are projected.\n"
-		# 	node.annotations += annotation
