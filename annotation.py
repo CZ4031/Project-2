@@ -26,8 +26,6 @@ class Annotation:
 		if nodeType == "Seq Scan":
 			table = node.attributes['Relation Name']
 			node.annotations += "Sequential scan is used to read the {} table".format(table)
-			if "Filter" in node.attributes:
-				node.annotations += ", with filter {}".format(node.attributes['Filter'])
 			node.annotations += ".\n"
 			self.comparison(node)
 
@@ -38,8 +36,6 @@ class Annotation:
 				# cond = plans[i]['Index Cond']
 				# split = cond.split(":", 1)
 				node.annotations += " with conditions {}".format(node.attributes['Index Cond'])
-			if "Filter" in node.attributes:
-				node.annotations += ". The result is then filtered using {}".format(node.attributes['Filter'])
 			node.annotations += ".\n"
 			self.comparison(node)
 
@@ -48,8 +44,6 @@ class Annotation:
 			node.annotations += "Index only scan is used to read the {} table".format(table)
 			if "Index Cond" in node.attributes:
 				node.annotations += " with conditions {}".format(node.attributes['Index Cond'])
-			if "Filter" in node.attributes:
-				node.annotations += ". The result is then filtered using {}".format(node.attributes['Filter'])
 			node.annotations += ".\n"
 			self.comparison(node)
 
@@ -58,7 +52,11 @@ class Annotation:
 			cond = node.attributes['Hash Cond']
 			try:
 				cond = cond.replace(" ", "")
-				cond = cond.lstrip("(").rstrip(")")
+				cond = cond.replace(")AND(", ", ")
+				cond = cond.replace(")OR(", ", ")
+				cond = cond.replace("(", "")
+				cond = cond.replace(")", "")
+
 				condsplit = cond.split('.')
 				table1 = condsplit[0]
 				condsplit2 = condsplit[1].split('=')
@@ -73,7 +71,11 @@ class Annotation:
 			cond = node.attributes['Merge Cond']
 			try:
 				cond = cond.replace(" ", "")
-				cond = cond.lstrip("(").rstrip(")")
+				cond = cond.replace(")AND(", ", ")
+				cond = cond.replace(")OR(", ", ")
+				cond = cond.replace("(", "")
+				cond = cond.replace(")", "")
+
 				condsplit = cond.split('.')
 				table1 = condsplit[0]
 				condsplit2 = condsplit[1].split('=')
@@ -151,20 +153,11 @@ class Annotation:
 			node.annotations += annotation
 
 		if nodeType == "Gather Merge":
-			annotation = "Gather Merge operation is performed.\n"
+			annotation = "Gather Merge operation is performed, combining the output of child nodes.\n"
 			node.annotations += annotation
 
 		if nodeType == "Append":
 			annotation = "Append Tables.\n"
-			node.annotations += annotation
-
-		# i dont think theres select and project...?
-		if nodeType == "Select":
-			annotation = "Tuples fulfilling the conditions are selected.\n"
-			node.annotations += annotation
-
-		if nodeType == "Project":
-			annotation = "Unnecessary elements are removed and the remaining elements are projected.\n"
 			node.annotations += annotation
 
 		if nodeType == "Bitmap Index Scan":
@@ -177,3 +170,67 @@ class Annotation:
 							"sort the indices and quickly cut down the number of tuples scanned.\n "
 			node.annotations += annotation
 			self.comparison(node)
+
+		if nodeType == "CTE Scan":
+			annotation = "CTE Scan is performed on table {}.\n".format(node.attributes['CTE Name'])
+			node.annotations += annotation
+			self.comparison(node)
+
+		if nodeType == "Foreign Scan":
+			annotation = "Foreign Scan is performed on table {}.\n".format(node.attributes['Relation Name'])
+			node.annotations += annotation
+			self.comparison(node)
+
+		if nodeType == "Limit":
+			numRows = node.attributes['Plan Rows']
+			annotation = "The Limit operation limits the scanning of the table, with a limitation of {} rows\n".format(numRows)
+			node.annotations += annotation
+
+		if nodeType == "Materialize":
+			annotation = "The Materialize operation is performed, storing the result of the child operation in memory.\n"
+			node.annotations += annotation
+
+		if nodeType == "GroupAggregate":
+			if "Group Key" in node.attributes:
+				group_key = node.attributes['Group Key']
+				list_of_keys = []
+				for key in group_key:
+					list_of_keys.append(key)
+				stringOfKeys = ', '.join(list_of_keys)
+				if len(stringOfKeys) > 1:
+					stringOfKeys = ', '.join(list_of_keys)
+				else:
+					stringOfKeys = list_of_keys[0]
+				#print("---------------------", stringOfKeys)
+				annotation = "The Group Aggregate operation will perform grouping on keys: {}.\n".format(stringOfKeys)
+			else:
+				annotation = "The Group Aggregate operation will be performed.\n"
+			node.annotations += annotation
+			self.comparison(node)
+
+		if nodeType == "HashAggregate":
+			if "Group Key" in node.attributes:
+				group_key = node.attributes['Group Key']
+				list_of_keys = []
+				for key in group_key:
+					list_of_keys.append(key)
+				stringOfKeys = ', '.join(list_of_keys)
+				if len(stringOfKeys) > 1:
+					stringOfKeys = ', '.join(list_of_keys)
+				else:
+					stringOfKeys = list_of_keys[0]
+				#print("---------------------", stringOfKeys)
+				annotation = "The Hash Aggregate operation will perform grouping on keys: {}.\n".format(stringOfKeys)
+			else:
+				annotation = "The Hash Aggregate operation will be performed.\n"
+			node.annotations += annotation
+			self.comparison(node)
+
+		# i dont think theres select and project...?
+		# if nodeType == "Select":
+		# 	annotation = "Tuples fulfilling the conditions are selected.\n"
+		# 	node.annotations += annotation
+
+		# if nodeType == "Project":
+		# 	annotation = "Unnecessary elements are removed and the remaining elements are projected.\n"
+		# 	node.annotations += annotation
