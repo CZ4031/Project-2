@@ -12,15 +12,43 @@ class Annotation:
 	def comparison(self, node):
 		if len(node.alternate_plans) != 0:
 			for altScan in node.alternate_plans:
-				annotation = f"Compared to {node.attributes['Node Type']}, {altScan} is {node.alternate_plans.get(altScan):.2f} " \
+				annotation = f"\nCompared to {node.attributes['Node Type']}, {altScan} is {node.alternate_plans.get(altScan):.2f} " \
 								f"times as expensive.\n"
 				node.annotations += annotation
 		else:
-			annotation = f"{node.attributes['Node Type']} is used across all AQPs."
+			annotation = f"{node.attributes['Node Type']} is used across all AQPs.\n"
 			node.annotations += annotation
+
+	def getKeys(self, node):
+		group_key = []
+		if "Group Key" in node.attributes:
+			group_key = node.attributes['Group Key']
+		# elif "Sort Key" in node.attributes:
+		# 	group_key = node.attributes['Sort Key']
+
+		list_of_keys = []
+		for key in group_key:
+			list_of_keys.append(key)
+		stringOfKeys = ', '.join(list_of_keys)
+		if len(stringOfKeys) > 1:
+			stringOfKeys = ', '.join(list_of_keys)
+		else:
+			stringOfKeys = list_of_keys[0]
+		print("---------------------", stringOfKeys)
+		return stringOfKeys
+
+	def getTables(self, cond):
+		cond = cond.replace(" ", "")
+		cond = cond.lstrip("(").rstrip(")")
+		condsplit = cond.split('.')
+		table1 = condsplit[0]
+		condsplit2 = condsplit[1].split('=')
+		table2 = condsplit2[1]
+		return table1, table2
 
 	def generateAnnotation(self, node):
 		nodeType = node.attributes['Node Type']
+		annotation = ""
 
 		# For scans
 		if nodeType == "Seq Scan":
@@ -105,30 +133,13 @@ class Annotation:
 			strategy = node.attributes['Strategy']
 			if strategy == "Sorted":
 				if "Group Key" in node.attributes:
-					group_key = node.attributes['Group Key']
-					list_of_keys = []
-					for key in group_key:
-						list_of_keys.append(key)
-					stringOfKeys = ', '.join(list_of_keys)
-					if len(list_of_keys) > 1:
-						stringOfKeys = ', '.join(list_of_keys)
-					else:
-						stringOfKeys = list_of_keys[0]
-					#print("---------------------", stringOfKeys)
+					stringOfKeys = self.getKeys(node)
 					annotation = "The Sort Aggregate operation will perform grouping on keys: {}.\n".format(stringOfKeys)
 				else:
 					annotation = "The Sort Aggregate operation will be performed.\n"
 			elif strategy == "Hashed":
 				if "Group Key" in node.attributes:
-					group_key = node.attributes['Group Key']
-					list_of_keys = []
-					for key in group_key:
-						list_of_keys.append(key)
-					if len(list_of_keys) > 1:
-						stringOfKeys = ', '.join(list_of_keys)
-					else:
-						stringOfKeys = list_of_keys[0]
-					#print("---------------------", stringOfKeys)
+					stringOfKeys = self.getKeys(node)
 					annotation = "The Hash Aggregate operation will perform grouping on {}.\n".format(stringOfKeys)
 				else:
 					annotation = "The Hash Aggregate operation will be performed.\n"
@@ -137,11 +148,24 @@ class Annotation:
 			node.annotations += annotation
 
 		if nodeType == "Sort":
-			annotation = "Sort the table based on the key {}.\n".format(node.attributes['Sort Key'])
-			if "INC" in node.attributes["Sort Key"]:
-				annotation += 'in an incremental manner.\n'
-			if "DESC" in node.attributes["Sort Key"]:
-				annotation += 'in a decremental manner.\n'
+			# sortKey = self.getKeys(node)
+			print(node.attributes['Sort Key'])
+			# print(sortKey)
+			print()
+
+			annotation = "Sort the table on keys "
+			desc = False
+			for key in node.attributes['Sort Key']:
+				if "DESC" in key:
+					desc = True
+				else:
+					annotation += f"{key}, "
+			annotation = annotation[:-2]
+			if desc:
+				annotation += ' in a decremental manner.'
+			else:
+				annotation += ' in an incremental manner.'
+			annotation += '\n\n'
 			node.annotations += annotation
 
 		if nodeType == "Unique":
